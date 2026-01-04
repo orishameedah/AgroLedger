@@ -1,6 +1,19 @@
 import Link from "next/link";
+import {
+  FaLinkedin,
+  FaXTwitter,
+  FaInstagram,
+  FaYoutube,
+} from "react-icons/fa6";
 
 export function Footer() {
+  const socialLinks = [
+    { icon: <FaLinkedin size={18} />, href: "#", label: "LinkedIn" },
+    { icon: <FaXTwitter size={18} />, href: "#", label: "Twitter" },
+    { icon: <FaInstagram size={20} />, href: "#", label: "Instagram" },
+    { icon: <FaYoutube size={20} />, href: "#", label: "YouTube" },
+  ];
+
   return (
     <footer className="bg-linear-to-b from-brand-green/90 to-green-950 mt-10  py-12 text-white">
       <div className="container mx-auto px-4">
@@ -12,6 +25,20 @@ export function Footer() {
             <p className="text-muted-foreground leading-relaxed">
               Securing Nigeria&apos;s harvest through blockchain transparency.
             </p>
+
+            {/* --- Social Icons Row --- */}
+            <div className="flex mt-2 items-center gap-4">
+              {socialLinks.map((social, index) => (
+                <a
+                  key={index}
+                  href={social.href}
+                  aria-label={social.label}
+                  className="p-2 rounded-full bg-white/5 border border-white/10 text-green-50/70 hover:text-brand-amber hover:border-brand-amber hover:bg-brand-amber/10 transition-all duration-300"
+                >
+                  {social.icon}
+                </a>
+              ))}
+            </div>
           </div>
 
           <div>
@@ -57,13 +84,7 @@ export function Footer() {
                 href="/signup/buyer"
                 className="text-muted-foreground hover:text-primary transition-colors"
               >
-                Farmer Login
-              </Link>
-              <Link
-                href="/login/farmer"
-                className="text-muted-foreground hover:text-primary transition-colors"
-              >
-                Go to Marketplace
+                Buyer Signup
               </Link>
             </nav>
           </div>

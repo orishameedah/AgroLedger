@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Blocks, Handshake, Wallet } from "lucide-react";
+import { Blocks, Handshake, Verified } from "lucide-react";
 import { FeatureCard } from "./about-features";
 
 const features = [
@@ -18,10 +18,10 @@ const features = [
       "Connect farmers directly with buyers, removing middlemen and ensuring fair compensation for agricultural producers.",
   },
   {
-    icon: Wallet,
-    title: "Fast, Secure Payments",
+    icon: Verified,
+    title: "Verified Provenance",
     description:
-      "Blockchain-powered payments ensure farmers receive their money quickly and securely, with no delays or intermediaries.",
+      "Every harvest carries a digital certificate of origin, allowing buyers to verify the quality and source of their food directly from the soil it was grown in.",
   },
 ];
 
