@@ -1,11 +1,12 @@
 "use client";
 
-import Image from "next/image";
-import backgroundImg from "@/public/web-images/african-community-support-agriculture-teamwork.jpg";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { RoleSelectionModal } from "./RoleSeclectionModal";
+import { useState } from "react";
 
 export function HeroSection() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   return (
     <section className="relative min-h-[90vh] flex-center overflow-hidden">
       {/* Background Image */}
@@ -23,33 +24,28 @@ export function HeroSection() {
           transition={{ duration: 0.8, ease: "easeInOut" }}
           className="max-w-4xl mx-auto"
         >
-          {/* <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight"> */}
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
             Securing Nigeria's Harvest through{" "}
             <span className="text-green-400">Blockchain Transparency</span>
           </h1>
 
-          {/* <p className="text-lg md:text-xl text-gray-200 mb-10 max-w-2xl mx-auto"> */}
           <p className="text-gray-300 mb-10 max-w-2xl mx-auto">
             AgroLedger connects farmers directly to buyers, eliminating
             middlemen and ensuring fair prices with immutable records.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link
-              href="/signup"
-              className="bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-10 rounded-full transition-all hover:scale-105 w-full sm:w-auto text-lg"
+            <button
+              className="bg-white/10 cursor-pointer hover:bg-green-700 text-white border-2 border-white font-bold py-4 px-10 rounded-full transition-all hover:scale-105 w-full sm:w-auto text-lg"
+              onClick={() => setIsModalOpen(true)}
             >
               Get Started
-            </Link>
-
-            <Link
-              href="/marketplace"
-              className="bg-white/10 hover:bg-white/20 text-white border-2 border-white font-bold py-4 px-10 rounded-full transition-all w-full sm:w-auto text-lg backdrop-blur-sm"
-            >
-              Go to Marketplace
-            </Link>
+            </button>
           </div>
+          <RoleSelectionModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+          />
         </motion.div>
       </div>
     </section>
