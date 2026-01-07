@@ -5,6 +5,13 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { LoginSchema, LoginInput } from "@/lib/zod";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
+import { SuccessMessage } from "../ui/SuccessMessage";
 
 interface AuthFormProps {
   mainTitle: string; // Title above the card (e.g., Agroledger Dashboard)
@@ -14,6 +21,7 @@ interface AuthFormProps {
 
 export const LoginForm = ({ mainTitle, formTitle, role }: AuthFormProps) => {
   const [showPassword, setShowPassword] = useState(false); // Initial state is hidden
+  const [showSuccess, setShowSuccess] = useState(false);
 
   // Dynamically set the signup link based on the role prop
   const signupPath = role === "farmer" ? "/signup/farmer" : "/signup/buyer";
@@ -21,8 +29,105 @@ export const LoginForm = ({ mainTitle, formTitle, role }: AuthFormProps) => {
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev); // Toggles true/false
   };
+
+  const [error, setError] = useState("");
+  const router = useRouter();
+
+  const [isRedirecting, setIsRedirecting] = useState(false); // New state for global loading
+  const [fieldErrors, setFieldErrors] = useState({
+    identifier: "",
+    password: "",
+  });
+
+  const {
+    register,
+    handleSubmit,
+    formState: { isSubmitting, errors },
+  } = useForm<LoginInput>({
+    resolver: zodResolver(LoginSchema),
+    defaultValues: {
+      identifier: "",
+      password: "",
+    },
+  });
+
+  // --- GOOGLE LOGIN LOGIC ---
+  const handleGoogleLogin = async () => {
+    setIsRedirecting(true);
+    // const callbackUrl = role === "farmer" ? "/farmer-setup" : "/marketplace";
+    // await signIn("google", { callbackUrl });
+
+    // We add the role to the URL so we can "catch" it later
+    const callbackUrl =
+      role === "farmer"
+        ? "/farmer-setup?role=farmer"
+        : "/marketplace?role=buyer";
+
+    await signIn("google", { callbackUrl });
+  };
+
+  const onLogin = async (data: LoginInput) => {
+    // 1. Reset all errors immediately
+    setFieldErrors({ identifier: "", password: "" });
+    setError("");
+
+    try {
+      // 2. Attempt Sign In
+      const result = await signIn("credentials", {
+        identifier: data.identifier,
+        password: data.password,
+        redirect: false,
+      });
+
+      // 3. Handle Errors
+      if (result?.error) {
+        const errorMsg = result.error.toLowerCase();
+
+        if (errorMsg.includes("user") || errorMsg.includes("email")) {
+          setFieldErrors((prev) => ({
+            ...prev,
+            identifier: "Username or Email doesn't exist",
+          }));
+        } else if (
+          errorMsg.includes("password") ||
+          errorMsg.includes("credentials")
+        ) {
+          setFieldErrors((prev) => ({
+            ...prev,
+            password: "Incorrect Password",
+          }));
+        } else {
+          setError("Something went wrong. Please try again later.");
+        }
+        return;
+      }
+
+      // 4. Success Path
+      if (result?.ok) {
+        // Trigger the Universal Success Popup
+        setShowSuccess(true);
+
+        // We wait for 2 seconds (2000ms) so the user can actually read the success message
+        setTimeout(() => {
+          setIsRedirecting(true); // Show the button loader/spinner
+
+          const path = role === "farmer" ? "/farmer-setup" : "/marketplace";
+
+          router.push(path);
+          router.refresh();
+        }, 2000);
+      }
+    } catch (err) {
+      setError("A network error occurred. Check your connection.");
+    }
+  };
+
   return (
     <section className="relative min-h-screen w-full flex flex-col items-center justify-center p-3 md:p-6 overflow-hidden bg-linear-to-b from-green-950/90 via-black/80 to-emerald-950/90 z-10">
+      <SuccessMessage
+        isVisible={showSuccess}
+        message="Login successful! Redirecting you now..."
+      />
       {/* Top Header Label */}
       <motion.h1
         initial={{ opacity: 0, y: -20 }}
@@ -47,6 +152,7 @@ export const LoginForm = ({ mainTitle, formTitle, role }: AuthFormProps) => {
         <button
           className="w-full py-3 px-6 text-slate-700 font-bold border-2 border-slate-200 rounded-2xl flex items-center 
         text-md justify-center gap-3 hover:bg-slate-50 transition-all active:scale-[0.98] cursor-pointer"
+          onClick={handleGoogleLogin}
         >
           <FcGoogle className="w-6 h-6" />
           Login with Google
@@ -64,31 +170,39 @@ export const LoginForm = ({ mainTitle, formTitle, role }: AuthFormProps) => {
         </div>
 
         {/* Manual Form */}
-        <form className="space-y-4">
+        <form className="space-y-4" onSubmit={handleSubmit(onLogin)}>
           <div>
-            <label className="block text-sm font-bold text-slate-700 mb-1.5">
-              Email Address
-            </label>
+            <label className="label">Email Address or Username</label>
             <input
-              type="email"
+              {...register("identifier")}
               placeholder="john@example.com"
-              className="w-full p-4 rounded-xl border border-slate-200 focus:ring-2 focus:ring-green-600 outline-none transition-all bg-slate-50/50"
-              required
+              className={`input-field ${
+                errors.identifier || fieldErrors.identifier
+                  ? "border-red-500 bg-red-50"
+                  : ""
+              }`}
             />
+            {(errors.identifier || fieldErrors.identifier) && (
+              <p className="text-red-500 text-xs mt-1 font-semibold">
+                {errors.identifier?.message || fieldErrors.identifier}
+              </p>
+            )}
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-slate-700 mb-1.5">
-              Password
-            </label>
+            <label className="label">Password</label>
             <div className="relative">
               {" "}
               <input
                 // Conditional type based on state
                 type={showPassword ? "text" : "password"}
                 placeholder="••••••••"
-                className="w-full p-4 pr-12 rounded-xl border border-slate-200 focus:ring-2 focus:ring-green-600 outline-none transition-all bg-slate-50/50"
-                required
+                className={`input-field ${
+                  errors.password || fieldErrors.password
+                    ? "border-red-500 bg-red-50"
+                    : ""
+                }`}
+                {...register("password")}
               />
               {/* Toggle Button */}
               <button
@@ -100,24 +214,32 @@ export const LoginForm = ({ mainTitle, formTitle, role }: AuthFormProps) => {
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
             </div>
+            {(errors.password || fieldErrors.password) && (
+              <p className="text-red-500 text-xs mt-1 font-semibold">
+                {errors.password?.message || fieldErrors.password}
+              </p>
+            )}
           </div>
 
-          <div className="flex items-center gap-x-2">
-            <input
-              type="checkbox"
-              id="terms"
-              className="w-4 h-4 accent-green-600 cursor-pointer"
-            />
-            <label htmlFor="terms" className="text-sm text-slate-600">
-              Keep me logged in
-            </label>
+          <div className="flex justify-start">
+            <Link
+              href={`/forgot-password/${role}`}
+              className="text-sm font-semibold text-green-700 hover:text-green-800 transition-colors"
+            >
+              Forgot Password?
+            </Link>
           </div>
 
           <button
             type="submit"
-            className="w-full bg-green-700 hover:bg-green-800 text-white font-medium py-3 rounded-2xl transition-all shadow-lg shadow-green-900/20 active:scale-[0.98] cursor-pointer"
+            className="button-form"
+            disabled={isSubmitting || isRedirecting}
           >
-            Login
+            {isSubmitting ? (
+              <Loader2 className="animate-spin w-5 h-5 items-center justify-center" />
+            ) : (
+              "Sign In"
+            )}
           </button>
         </form>
 
