@@ -42,12 +42,12 @@ export function HeroSection() {
               Get Started
             </button>
           </div>
-          <RoleSelectionModal
-            isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
-          />
         </motion.div>
       </div>
+      <RoleSelectionModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </section>
   );
 }

@@ -3,8 +3,15 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Eye, EyeOff } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
+import { signIn } from "next-auth/react";
+import axios from "axios";
+import { SignupSchema, SignupInput } from "@/lib/zod";
+import { useRouter } from "next/navigation";
+import { SuccessMessage } from "../ui/SuccessMessage";
 
 interface AuthFormProps {
   mainTitle: string; // Title above the card (e.g., Agroledger Dashboard)
@@ -14,6 +21,47 @@ interface AuthFormProps {
 
 export const SignUpForm = ({ mainTitle, formTitle, role }: AuthFormProps) => {
   const [showPassword, setShowPassword] = useState(false); // Initial state is hidden
+  const [serverError, setServerError] = useState<string | null>(null);
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  const router = useRouter();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<SignupInput>({
+    resolver: zodResolver(SignupSchema),
+  });
+
+  const onSubmit = async (data: SignupInput) => {
+    setServerError(null);
+    try {
+      // 1. Send data to our custom signup API
+      await axios.post("/api/auth/signup", {
+        ...data,
+        role, // Pass the role prop (farmer or buyer)
+      });
+
+      // 2. On success, redirect to login
+      setShowSuccess(true);
+
+      setTimeout(() => {
+        router.push(role === "farmer" ? "/login/farmer" : "/login/buyer");
+      }, 3000);
+      // router.push(role === "farmer" ? "/login/farmer" : "/login/buyer");
+    } catch (error: any) {
+      setServerError(
+        error.response?.data?.message || "An unexpected error occurred."
+      );
+    }
+  };
+
+  const handleGoogleSignup = () => {
+    // Redirects to setup for farmers or marketplace for buyers after Google login
+    const callbackUrl = role === "farmer" ? "/farmer-setup" : "/marketplace";
+    signIn("google", { callbackUrl });
+  };
 
   // Dynamically set the signup link based on the role prop
   const loginPath = role === "farmer" ? "/login/farmer" : "/login/buyer";
@@ -21,8 +69,13 @@ export const SignUpForm = ({ mainTitle, formTitle, role }: AuthFormProps) => {
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev); // Toggles true/false
   };
+
   return (
     <section className="relative min-h-screen w-full flex flex-col items-center justify-center p-3 md:p-6 overflow-hidden bg-linear-to-b from-green-950/90 via-black/80 to-emerald-950/90 z-10">
+      <SuccessMessage
+        isVisible={showSuccess}
+        message="Signup successfully! Redirecting to login..."
+      />
       {/* Top Header Label */}
       <motion.h1
         initial={{ opacity: 0, y: -20 }}
@@ -46,6 +99,7 @@ export const SignUpForm = ({ mainTitle, formTitle, role }: AuthFormProps) => {
 
         {/* Google Auth Button */}
         <button
+          onClick={handleGoogleSignup}
           className="w-full py-3 px-6 text-slate-700 font-bold border-2 border-slate-200 rounded-2xl flex items-center 
         text-md justify-center gap-3 hover:bg-slate-50 transition-all active:scale-[0.98] cursor-pointer"
         >
@@ -64,44 +118,68 @@ export const SignUpForm = ({ mainTitle, formTitle, role }: AuthFormProps) => {
           </div>
         </div>
 
+        {/* Display Server Errors */}
+        {serverError && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl font-medium">
+            {serverError}
+          </div>
+        )}
+
         {/* Manual Form */}
-        <form className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
-            <label className="block text-sm font-bold text-slate-700 mb-1.5">
-              Username
-            </label>
+            <label className="label">Full Name</label>
             <input
-              type="text"
+              {...register("name")}
+              placeholder="Your full name"
+              className={`input-field ${
+                errors.name ? "error-name1" : "error-name2"
+              } input-field:focus`}
+            />
+            {errors.name && (
+              <p className="error-message">{errors.name.message}</p>
+            )}
+          </div>
+          <div>
+            <label className="label">Username</label>
+            <input
+              {...register("username")}
               placeholder="Your username"
-              className="w-full p-4 rounded-xl border border-slate-200 focus:ring-2 focus:ring-green-600 outline-none transition-all bg-slate-50/50"
-              required
+              className={`input-field ${
+                errors.username ? "error-name1" : "error-name2"
+              } input-field:focus`}
             />
+            {errors.username && (
+              <p className="error-message">{errors.username.message}</p>
+            )}
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-slate-700 mb-1.5">
-              Email Address
-            </label>
+            <label className="label">Email Address</label>
             <input
-              type="email"
+              {...register("email")}
               placeholder="john@example.com"
-              className="w-full p-4 rounded-xl border border-slate-200 focus:ring-2 focus:ring-green-600 outline-none transition-all bg-slate-50/50"
-              required
+              className={`input-field ${
+                errors.email ? "error-name1" : "error-name2"
+              } input-field:focus`}
             />
+            {errors.email && (
+              <p className="error-message">{errors.email.message}</p>
+            )}
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-slate-700 mb-1.5">
-              Password
-            </label>
+            <label className="label">Password</label>
             <div className="relative">
               {" "}
               <input
+                {...register("password")}
                 // Conditional type based on state
                 type={showPassword ? "text" : "password"}
                 placeholder="••••••••"
-                className="w-full p-4 pr-12 rounded-xl border border-slate-200 focus:ring-2 focus:ring-green-600 outline-none transition-all bg-slate-50/50"
-                required
+                className={`input-field ${
+                  errors.password ? "error-name1" : "error-name2"
+                } input-field:focus`}
               />
               {/* Toggle Button */}
               <button
@@ -113,24 +191,16 @@ export const SignUpForm = ({ mainTitle, formTitle, role }: AuthFormProps) => {
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
             </div>
+            {errors.password && (
+              <p className="error-message">{errors.password.message}</p>
+            )}
           </div>
-
-          <div className="flex items-center gap-x-2">
-            <input
-              type="checkbox"
-              id="terms"
-              className="w-4 h-4 accent-green-600 cursor-pointer"
-            />
-            <label htmlFor="terms" className="text-sm text-slate-600">
-              I agree to the Terms of Service
-            </label>
-          </div>
-
-          <button
-            type="submit"
-            className="w-full bg-green-700 hover:bg-green-800 text-white font-medium py-3 rounded-2xl transition-all shadow-lg shadow-green-900/20 active:scale-[0.98] cursor-pointer"
-          >
-            Create {role === "farmer" ? "Farmer" : "Buyer"} Account
+          <button type="submit" disabled={isSubmitting} className="button-form">
+            {isSubmitting ? (
+              <Loader2 className="animate-spin w-5 h-5" />
+            ) : (
+              `Create ${role === "farmer" ? "Farmer" : "Buyer"} Account`
+            )}
           </button>
         </form>
 
