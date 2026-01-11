@@ -117,7 +117,7 @@ export const LoginForm = ({ mainTitle, formTitle, role }: AuthFormProps) => {
           router.refresh();
         }, 2000);
       }
-    } catch (err) {
+    } catch (error) {
       setError("A network error occurred. Check your connection.");
     }
   };
@@ -175,6 +175,8 @@ export const LoginForm = ({ mainTitle, formTitle, role }: AuthFormProps) => {
             <label className="label">Email Address or Username</label>
             <input
               {...register("identifier")}
+              name="identifier"
+              autoComplete="username"
               placeholder="john@example.com"
               className={`input-field ${
                 errors.identifier || fieldErrors.identifier
@@ -194,15 +196,28 @@ export const LoginForm = ({ mainTitle, formTitle, role }: AuthFormProps) => {
             <div className="relative">
               {" "}
               <input
-                // Conditional type based on state
+                // // Conditional type based on state
+                // type={showPassword ? "text" : "password"}
+                // name="password"
+                // autoComplete="current-password"
+                // placeholder="••••••••"
+                // className={`input-field ${
+                //   errors.password || fieldErrors.password
+                //     ? "border-red-500 bg-red-50"
+                //     : ""
+                // }`}
+                // {...register("password")}
+                // 1. Spread first: This provides name, onChange, onBlur, and ref
+                {...register("password")}
+                // 2. Overrides second: These will work perfectly now
                 type={showPassword ? "text" : "password"}
+                autoComplete="current-password"
                 placeholder="••••••••"
                 className={`input-field ${
                   errors.password || fieldErrors.password
                     ? "border-red-500 bg-red-50"
                     : ""
                 }`}
-                {...register("password")}
               />
               {/* Toggle Button */}
               <button
