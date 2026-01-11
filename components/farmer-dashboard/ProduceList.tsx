@@ -314,7 +314,7 @@ function ProduceRow({ item, actions, activeMenu, setActiveMenu }: any) {
         </button>
         {activeMenu === item._id && (
           <ActionDropdown
-            status={item.status}
+            status={item.blockchainStatus}
             actions={actions}
             onClose={() => setActiveMenu(null)}
           />
@@ -364,7 +364,7 @@ function ProduceCard({ item, actions, activeMenu, setActiveMenu }: any) {
       </div>
       {activeMenu === item._id && (
         <ActionDropdown
-          status={item.status}
+          status={item.blockchainStatus}
           actions={actions}
           isMobile
           onClose={() => setActiveMenu(null)}

@@ -196,18 +196,6 @@ export const LoginForm = ({ mainTitle, formTitle, role }: AuthFormProps) => {
             <div className="relative">
               {" "}
               <input
-                // // Conditional type based on state
-                // type={showPassword ? "text" : "password"}
-                // name="password"
-                // autoComplete="current-password"
-                // placeholder="••••••••"
-                // className={`input-field ${
-                //   errors.password || fieldErrors.password
-                //     ? "border-red-500 bg-red-50"
-                //     : ""
-                // }`}
-                // {...register("password")}
-                // 1. Spread first: This provides name, onChange, onBlur, and ref
                 {...register("password")}
                 // 2. Overrides second: These will work perfectly now
                 type={showPassword ? "text" : "password"}

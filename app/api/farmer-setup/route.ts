@@ -5,42 +5,6 @@ import dbConnect from "@/lib/mongodb";
 import Farm from "@/models/FarmSetup";
 import User from "@/models/User";
 
-// export async function POST(req: Request) {
-//   try {
-//     const session = await getServerSession(authOptions);
-//     if (!session) return new NextResponse("Unauthorized", { status: 401 });
-
-//     const data = await req.json();
-//     await dbConnect();
-
-//     // 1. Create the Farm entry
-//     await Farm.create({
-//       userId: session.user._id,
-//       ...data,
-//       availability: {
-//         startTime: data.startTime,
-//         endTime: data.endTime,
-//         days: data.availableDays,
-//       },
-//     });
-
-//     // 2. IMPORTANT: Update the User to 'farmer' and mark setup as complete
-//     await User.findByIdAndUpdate(session.user.id, {
-//       role: "farmer",
-//       isSetupComplete: true,
-//     });
-
-//     return NextResponse.json({ message: "Setup complete" }, { status: 200 });
-//   } catch (error) {
-//     return NextResponse.json(
-//       { error: "Failed to save setup" },
-//       { status: 500 }
-//     );
-//   }
-// }
-
-// ... existing imports
-
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);

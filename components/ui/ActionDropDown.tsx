@@ -11,37 +11,37 @@ interface ActionItem {
 }
 
 interface ActionDropdownProps {
-  status?: string; // Optional: Only used for Produce
+  status?: string; // This will receive the blockchainStatus
   onClose: () => void;
   isMobile?: boolean;
-  actions: ActionItem[]; // The dynamic list of buttons
+  actions: ActionItem[];
 }
 
 export function ActionDropdown({
-  status,
+  status, // This is your 'item.blockchainStatus'
   onClose,
   isMobile,
   actions,
 }: ActionDropdownProps) {
-  // Produce-specific status logic (only if status is provided)
+  // Mapping logic using 'blockchainStatus' values
   const statusConfig = status
     ? {
         published: {
           color: "text-emerald-500",
-          icon: CheckCircle2,
+          icon: CheckCircle2, // Using Shield for blockchain items
           label: "Published",
         },
         processing: {
           color: "text-blue-500",
           icon: Clock,
-          label: "Processing",
+          label: "Processing...",
         },
         none: {
           color: "text-slate-400",
           icon: XCircle,
-          label: "Not Published",
+          label: "Not published",
         },
-      }[status as "published" | "processing" | "none"] || {
+      }[status.toLowerCase() as "published" | "processing" | "none"] || {
         color: "text-slate-400",
         icon: XCircle,
         label: "Draft",

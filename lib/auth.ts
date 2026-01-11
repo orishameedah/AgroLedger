@@ -1,9 +1,10 @@
-import { NextAuthOptions } from "next-auth";
+import { NextAuthOptions, User as NextAuthUser, Session } from "next-auth"; // Renamed for clarity
+import { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import bcrypt from "bcryptjs";
 import dbConnect from "@/lib/mongodb";
-import User from "@/models/User";
+import UserModel from "@/models/User"; // Renamed import to avoid collision
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -20,30 +21,21 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         await dbConnect();
 
-        // 1. Find user by email OR username and EXPLICITLY ask for the hidden password
-        const user = await User.findOne({
+        const user = await UserModel.findOne({
           $or: [
             { email: credentials?.identifier.toLowerCase() },
             { username: credentials?.identifier },
           ],
         }).select("+password");
 
-        if (!user) {
-          throw new Error("No user found with this email or username");
-        }
+        if (!user) throw new Error("No user found with this email or username");
 
-        // 2. Compare the plain-text password from the form with the hash in DB
         const isValid = await bcrypt.compare(
           credentials!.password,
           user.password
         );
+        if (!isValid) throw new Error("Incorrect password");
 
-        if (!isValid) {
-          throw new Error("Incorrect password");
-        }
-
-        // 3. If everything is fine, return the user (without the password)
-        // Convert to plain object to remove sensitive Mongoose data
         return {
           id: user._id.toString(),
           email: user.email,
@@ -56,20 +48,15 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    // 1. JWT Callback: Put the role and setup status into the token
-
     async signIn({ user, account }) {
       if (account?.provider === "google") {
         try {
           await dbConnect();
           const userEmail = user.email?.toLowerCase();
-
-          // 1. Check if user already exists
-          const existingUser = await User.findOne({ email: userEmail });
+          const existingUser = await UserModel.findOne({ email: userEmail });
 
           if (!existingUser) {
-            // 2. Create the user without a password field
-            await User.create({
+            await UserModel.create({
               name: user.name || "Agroledger User",
               email: userEmail,
               image: user.image || "",
@@ -78,48 +65,43 @@ export const authOptions: NextAuthOptions = {
                 Math.floor(1000 + Math.random() * 9000),
               role: "buyer",
               isSetupComplete: false,
-              // Notice: We do NOT send a password field here!
             });
-            console.log("✅ Google user saved to MongoDB");
           }
           return true;
         } catch (error) {
           console.error("❌ MongoDB Save Error:", error);
-          return true; // Still let them in, but log the error
+          return true;
         }
       }
       return true;
     },
 
-    async jwt({ token, user }) {
+    // Using the types explicitly to satisfy TypeScript
+    async jwt({ token, user }: { token: JWT; user?: any }) {
       if (user) {
-        token.id = user.id; // Map the DB _id to token.id
-        token.role = (user as any).role;
-        token.isSetupComplete = (user as any).isSetupComplete;
-        token.username = (user as any).username;
+        token.id = user.id;
+        token.role = user.role;
+        token.isSetupComplete = user.isSetupComplete;
+        token.username = user.username;
       }
       return token;
     },
-    async session({ session, token }) {
+
+    async session({ session, token }: { session: any; token: JWT }) {
       if (session.user) {
-        (session.user as any).id = token.id; // Pass it to the session
-        (session.user as any).role = token.role;
-        (session.user as any).isSetupComplete = token.isSetupComplete;
-        (session.user as any).username = token.username;
+        session.user.id = token.id;
+        session.user.role = token.role;
+        session.user.isSetupComplete = token.isSetupComplete;
+        session.user.username = token.username;
       }
       return session;
     },
   },
   session: {
     strategy: "jwt",
-    // We keep the default at 30 days here.
     maxAge: 30 * 24 * 60 * 60,
-    // maxAge: 24 * 60 * 60,
   },
   pages: {
-    // If you want a general error to go to a specific role,
-    // it's usually better to point this to your main landing login or
-    // the buyer login as a default.
     signIn: "/login/buyer",
     error: "/login/buyer",
   },
