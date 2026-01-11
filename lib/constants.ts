@@ -57,3 +57,23 @@ export const DAYS_OF_WEEK = [
   "Saturday",
   "Sunday",
 ];
+
+// lib/constants.ts
+
+export const PRODUCE_CATEGORIES = [
+  "Livestock",
+  "Crops",
+  "Poultry",
+  "Dairy",
+  "Organic",
+  "Apiculture",
+] as const;
+
+export const UNITS_BY_CATEGORY: Record<string, string[]> = {
+  Livestock: ["heads", "kg"],
+  Crops: ["kg", "bags", "baskets", "tons", "tubers"],
+  Poultry: ["heads", "kg", "crates"],
+  Dairy: ["liters", "bottles", "gallons"],
+  Organic: ["kg", "bags", "bundles"],
+  Apiculture: ["kg", "jars", "liters"],
+};

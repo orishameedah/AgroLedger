@@ -96,6 +96,7 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id; // Map the DB _id to token.id
         token.role = (user as any).role;
         token.isSetupComplete = (user as any).isSetupComplete;
+        token.username = (user as any).username;
       }
       return token;
     },
@@ -104,6 +105,7 @@ export const authOptions: NextAuthOptions = {
         (session.user as any).id = token.id; // Pass it to the session
         (session.user as any).role = token.role;
         (session.user as any).isSetupComplete = token.isSetupComplete;
+        (session.user as any).username = token.username;
       }
       return session;
     },

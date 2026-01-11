@@ -1,15 +1,19 @@
-// Do NOT redefine Metadata if it's already in RootLayout
-// Unless you want to override it for these pages specifically.
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { DashboardLayout } from "@/components/farmer-dashboard/DashboardLayout";
+import { redirect } from "next/navigation";
 
-export default function MarketingLayout({
+export default async function Layout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <>
-    
-      {children}
-    </>
-  );
+  const session = await getServerSession(authOptions);
+
+  // Security: If no session, they can't see the dashboard
+  if (!session) {
+    redirect("/login/farmer");
+  }
+
+  return <DashboardLayout user={session.user}>{children}</DashboardLayout>;
 }

@@ -1,7 +1,8 @@
 import React from "react";
+import { HomeDashboard } from "@/components/farmer-dashboard/HomeDashboard";
 
-const FarmerDashboardPage = () => {
-  return <div>FarmerDashboardPage</div>;
+const HomeDashboardPage = () => {
+  return <HomeDashboard />;
 };
 
-export default FarmerDashboardPage;
+export default HomeDashboardPage;
