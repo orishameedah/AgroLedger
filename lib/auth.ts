@@ -77,13 +77,33 @@ export const authOptions: NextAuthOptions = {
     },
 
     // Using the types explicitly to satisfy TypeScript
-    async jwt({ token, user }: { token: JWT; user?: any }) {
+    async jwt({
+      token,
+      user,
+      trigger,
+      session,
+    }: {
+      token: JWT;
+      user?: any;
+      trigger?: string;
+      session?: any;
+    }) {
       if (user) {
         token.id = user.id;
         token.role = user.role;
         token.isSetupComplete = user.isSetupComplete;
         token.username = user.username;
       }
+
+      if (trigger === "update" && session?.user) {
+        // This updates the data inside the JWT cookie
+        token.name = session.user.name;
+        token.username = session.user.username;
+        if (session.user.isSetupComplete !== undefined) {
+          token.isSetupComplete = session.user.isSetupComplete;
+        }
+      }
+
       return token;
     },
 
@@ -93,6 +113,9 @@ export const authOptions: NextAuthOptions = {
         session.user.role = token.role;
         session.user.isSetupComplete = token.isSetupComplete;
         session.user.username = token.username;
+
+        // Sync the session name with the updated token name
+        session.user.name = token.name;
       }
       return session;
     },

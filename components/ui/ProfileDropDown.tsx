@@ -4,10 +4,12 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { User, LogOut, ChevronDown } from "lucide-react";
 import { signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
 
 export function ProfileDropdown({ user }: { user: any }) {
   const [profileOpen, setProfileOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const { data: session } = useSession();
 
   // Standard manual "Click Outside" logic
   useEffect(() => {
@@ -35,7 +37,7 @@ export function ProfileDropdown({ user }: { user: any }) {
 
         {/* Shows Username if available, otherwise "User" */}
         <span className="text-sm font-semibold text-slate-700 dark:text-slate-200 block">
-          {user?.username || user?.name || "User"}
+          {session?.user?.username || session?.user?.name || "User"}
         </span>
 
         <ChevronDown
@@ -51,7 +53,7 @@ export function ProfileDropdown({ user }: { user: any }) {
           <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-700 mb-1">
             <p className="text-xs text-slate-400 font-medium">Signed in as</p>
             <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400 truncate">
-              {user?.name}
+              {session?.user?.name}
             </p>
           </div>
 

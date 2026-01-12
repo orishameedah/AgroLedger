@@ -11,35 +11,47 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-
-// Dummy data for the interface preview
-const recentActivities = [
-  {
-    id: 1,
-    type: "Produce",
-    name: "Maize",
-    action: "Added New Entry",
-    date: "Jan 9, 2026",
-  },
-  {
-    id: 2,
-    type: "Sales",
-    name: "Goat",
-    action: "Recorded Sale",
-    date: "Jan 8, 2026",
-  },
-  {
-    id: 3,
-    type: "Market",
-    name: "Tomatoes",
-    action: "Published to Market",
-    date: "Jan 7, 2026",
-  },
-];
+import {
+  getDashboardStats,
+  getRecentActivities,
+} from "@/lib/actions/produce.actions";
+import { useState, useEffect } from "react";
 
 export const HomeDashboard = () => {
   const { data: session } = useSession(); // 2. Fetch the session here
   const user = session?.user;
+  const [activities, setActivities] = useState<any[]>([]);
+  const [stats, setStats] = useState({
+    totalValue: 0,
+    totalItems: 0,
+    activeListings: 0,
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadDashboardData() {
+      if (session?.user?.id) {
+        const [statsData, activityData] = await Promise.all([
+          getDashboardStats(session.user.id),
+          getRecentActivities(session.user.id),
+        ]);
+
+        setStats(statsData);
+        setActivities(activityData);
+        setLoading(false);
+      }
+    }
+    loadDashboardData();
+  }, [session]);
+
+  // Currency Formatter Helper
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat("en-NG", {
+      style: "currency",
+      currency: "NGN",
+      minimumFractionDigits: 0,
+    }).format(value);
+  };
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       {/* 1. HERO SECTION & ACTION BUTTONS */}
@@ -89,8 +101,9 @@ export const HomeDashboard = () => {
             <DollarSign className="w-6 h-6" />
           </div>
           <p className="stats-card-title">Total Produce Price</p>
-          <h3 className="stats-card-value">₦2,450,000</h3>
-          {/* Logic: db.produce.aggregate([ { $group: { _id: null, total: { $sum: "$totalValue" } } } ]) */}
+          <h3 className="stats-card-value">
+            {loading ? "..." : formatCurrency(stats.totalValue)}
+          </h3>
         </div>
 
         {/* Active Marketplace Listings */}
@@ -99,8 +112,9 @@ export const HomeDashboard = () => {
             <LayoutGrid className="w-6 h-6" />
           </div>
           <p className="stats-card-title">Active Listings</p>
-          <h3 className="stats-card-value">32</h3>
-          {/* Logic: db.produce.countDocuments({ blockchainStatus: "published" }) */}
+          <h3 className="stats-card-value">
+            {loading ? "..." : stats.activeListings}
+          </h3>
         </div>
 
         {/* Total Profit */}
@@ -109,8 +123,7 @@ export const HomeDashboard = () => {
             <TrendingUp className="w-6 h-6" />
           </div>
           <p className="stats-card-title">Total Sales Profit</p>
-          <h3 className="stats-card-value">₦320,000</h3>
-          {/* Logic: db.sales.aggregate([ { $group: { _id: null, profit: { $sum: "$profitAmount" } } } ]) */}
+          <h3 className="stats-card-value">₦0</h3>
         </div>
 
         {/* Total Inventory Items */}
@@ -119,65 +132,92 @@ export const HomeDashboard = () => {
             <Package className="w-6 h-6" />
           </div>
           <p className="stats-card-title">Produce Inventory</p>
-          <h3 className="stats-card-value">1,250</h3>
-          {/* Logic: db.produce.countDocuments({ userId: user.id }) */}
+          <h3 className="stats-card-value">
+            {loading ? "..." : stats.totalItems.toLocaleString()}
+          </h3>
         </div>
       </div>
 
-      {/* 3. RECENT ACTIVITIES SECTION */}
+      {/* 3. RECENT ACTIVITIES SECTION - Now Dynamic */}
       <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden">
+        {/* Header code stays same */}
         <div className="p-6 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
           <h3 className="font-bold text-lg text-slate-900 dark:text-white">
-            Recent Activities
+            Recent Farm Produce Activities
           </h3>
-          <button className="text-emerald-600 text-sm font-bold flex items-center gap-1 hover:underline">
-            View All <ArrowRight className="w-4 h-4" />
-          </button>
+          {/* <button className="text-emerald-600 text-sm font-bold flex items-center gap-1 hover:underline">
+            <Link href="/produce">
+              View All <ArrowRight className="w-4 h-4" />
+            </Link>
+          </button> */}
         </div>
 
-        <div className="overflow-x-auto">
+        {/* Desktop view */}
+        <div className="hidden sm:block overflow-x-auto">
           <table className="w-full text-left">
-            <thead>
-              <tr className="bg-slate-50 dark:bg-slate-900/50 text-slate-500 text-xs uppercase tracking-wider">
-                <th className="px-6 py-4">Activity</th>
-                <th className="px-6 py-4">Item Name</th>
-                <th className="px-6 py-4">Date</th>
-                <th className="px-6 py-4">Type</th>
-              </tr>
-            </thead>
+            {/* Thead code stays same */}
             <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
-              {recentActivities.map((activity) => (
-                <tr
-                  key={activity.id}
-                  className="hover:bg-slate-50 dark:hover:bg-slate-900/30 transition-colors"
-                >
-                  <td className="px-6 py-4 text-sm font-medium text-slate-900 dark:text-white">
-                    {activity.action}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">
-                    {activity.name}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-slate-500">
-                    {activity.date}
-                  </td>
-                  <td className="px-6 py-4">
-                    <span
-                      className={`text-[10px] font-bold uppercase px-2 py-1 rounded-full ${
-                        activity.type === "Produce"
-                          ? "bg-blue-100 text-blue-600"
-                          : activity.type === "Sales"
-                          ? "bg-emerald-100 text-emerald-600"
-                          : "bg-purple-100 text-purple-600"
-                      }`}
-                    >
-                      {activity.type}
-                    </span>
+              {loading ? (
+                <tr>
+                  <td colSpan={4} className="p-10 text-center text-slate-400">
+                    Loading activities...
                   </td>
                 </tr>
-              ))}
+              ) : activities.length > 0 ? (
+                activities.map((activity) => (
+                  <tr
+                    key={activity.id}
+                    className="hover:bg-slate-50 dark:hover:bg-slate-900/30 transition-colors"
+                  >
+                    <td className="px-6 py-4 text-sm font-medium text-slate-900 dark:text-white">
+                      {activity.action}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-slate-500 dark:text-slate-400">
+                      {activity.name}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-slate-500">
+                      {activity.date}
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="text-[10px] font-bold uppercase px-2 py-1 rounded-full bg-blue-100 text-blue-600">
+                        {activity.category}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={4} className="p-10 text-center text-slate-400">
+                    No recent activity found. Add some produce to get started!
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
-          {/* Logic: db.activities.find({ userId: user.id }).sort({ createdAt: -1 }).limit(5) */}
+        </div>
+
+        {/* Mobile view */}
+        {/* MOBILE LIST - Shown only on small screens (below 640px) */}
+        <div className="block sm:hidden divide-y divide-slate-100 dark:divide-slate-700">
+          {activities.map((activity) => (
+            <div key={activity.id} className="p-4 space-y-2">
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="text-sm font-bold text-slate-900 dark:text-white">
+                    {activity.action}
+                  </p>
+                  <p className="text-xs text-slate-500">{activity.name}</p>
+                </div>
+                <span className="text-[9px] font-black uppercase px-2 py-1 rounded-lg bg-blue-100 text-blue-600">
+                  {activity.category}
+                </span>
+              </div>
+              <div className="flex justify-between items-center text-[10px] text-slate-400">
+                <span>{activity.date}</span>
+                <span className="text-emerald-600 font-bold">Produce</span>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>

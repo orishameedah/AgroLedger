@@ -299,8 +299,12 @@ function ProduceRow({ item, actions, activeMenu, setActiveMenu }: any) {
         ₦{(item.totalPrice || 0).toLocaleString()}
       </td>
       <td className="inventory-td text-[11px] text-slate-500">
-        {item.createdAt
-          ? new Date(item.createdAt).toLocaleDateString()
+        {item.updatedAt
+          ? new Date(item.updatedAt).toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            })
           : "No Date"}
       </td>
       <td className="inventory-td relative text-center">
@@ -335,8 +339,12 @@ function ProduceCard({ item, actions, activeMenu, setActiveMenu }: any) {
           </h4>
           <p className="text-[11px] text-slate-500">
             {item.category} •{" "}
-            {item.createdAt
-              ? new Date(item.createdAt).toLocaleDateString()
+            {item.updatedAt
+              ? new Date(item.updatedAt).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                })
               : "No Date"}
           </p>
         </div>

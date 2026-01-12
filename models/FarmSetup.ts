@@ -1,35 +1,3 @@
-// import mongoose from "mongoose";
-
-// const FarmSchema = new mongoose.Schema({
-//   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-//   phoneNumber: { type: String, required: true },
-//   farmName: { type: String, required: true },
-//   //   farmTypes: {
-//   //     type: [String],
-//   //     validate: [(val) => val.length <= 5, "Max 5 types allowed"],
-//   //   },
-//   //   locations: {
-//   //     type: [String],
-//   //     validate: [(val) => val.length <= 5, "Max 5 locations allowed"],
-//   //   },
-//   farmTypes: {
-//     type: [String],
-//     validate: [(val: string[]) => val.length <= 5, "Max 5 types allowed"],
-//   },
-//   locations: {
-//     type: [String],
-//     validate: [(val: string[]) => val.length <= 5, "Max 5 locations allowed"],
-//   },
-
-//   availability: {
-//     start: String, // e.g., "08:00"
-//     end: String, // e.g., "17:00"
-//     days: [String], // e.g., ["Monday", "Tuesday"]
-//   },
-// });
-
-// export default mongoose.models.Farm || mongoose.model("Farm", FarmSchema);
-
 import mongoose from "mongoose";
 
 const FarmSchema = new mongoose.Schema(

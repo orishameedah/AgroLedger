@@ -10,6 +10,7 @@ import { saveProduce } from "@/lib/actions/produce.actions";
 import { SuccessMessage } from "../ui/SuccessMessage";
 import { ImageUpload } from "./ProduceImageUpload";
 import { ProduceFormFields } from "./ProduceForm";
+import { getFarmerCategories } from "@/lib/actions/user.actions";
 
 interface AddProduceModalProps {
   isOpen: boolean;
@@ -39,6 +40,7 @@ export function AddProduceModal({
   const [fileName, setFileName] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [availableCategories, setAvailableCategories] = useState<string[]>([]);
 
   // Sync state when editing or resetting
   useEffect(() => {
@@ -71,6 +73,18 @@ export function AddProduceModal({
     const price = parseFloat(formData.pricePerUnit) || 0;
     setTotal(qty * price);
   }, [formData.quantity, formData.pricePerUnit]);
+
+  const userId = session?.user?.id;
+
+  useEffect(() => {
+    if (isOpen && userId) {
+      const loadCats = async () => {
+        const cats = await getFarmerCategories(userId);
+        setAvailableCategories(cats);
+      };
+      loadCats();
+    }
+  }, [isOpen, userId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -149,9 +163,15 @@ export function AddProduceModal({
                 className="p-8 space-y-6 max-h-[75vh] overflow-y-auto"
               >
                 {/* 1. MOVED: Form Fields Component */}
+                {/* <ProduceFormFields
+                  formData={formData}
+                  setFormData={setFormData}
+                /> */}
+
                 <ProduceFormFields
                   formData={formData}
                   setFormData={setFormData}
+                  availableCategories={availableCategories}
                 />
 
                 {/* 2. MOVED: Image Upload Component */}

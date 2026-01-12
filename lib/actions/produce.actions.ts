@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import dbConnect from "../mongodb"; // Ensure you have a DB connection util
 import Produce from "@/models/Produce";
+import mongoose from "mongoose";
 
 export async function saveProduce(data: any, userId: string) {
   try {
@@ -52,7 +53,7 @@ export async function fetchAllProduce(userId: string) {
     const produceList = await Produce.find({
       userId,
       isArchived: { $ne: true },
-    }).sort({ createdAt: -1 }); // Newest first
+    }).sort({ updatedAt: -1 }); // Newest first
 
     return {
       success: true,
@@ -86,5 +87,76 @@ export async function deleteProduce(id: string) {
   } catch (error) {
     console.error("Delete Error:", error);
     return { success: false, error: "Critical error during deletion." };
+  }
+}
+
+export async function getDashboardStats(userId: string) {
+  try {
+    await dbConnect();
+
+    const stats = await Produce.aggregate([
+      {
+        $match: {
+          // Ensure we convert the string ID from the session to a MongoDB ObjectId
+          userId: new mongoose.Types.ObjectId(userId),
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          // Simple sum of your existing totalPrice field
+          totalValue: { $sum: "$totalPrice" },
+          // Simple sum of your quantity field
+          totalItems: { $sum: "$quantity" },
+          // Count how many have been published to blockchain
+          activeListings: {
+            $sum: {
+              $cond: [{ $eq: ["$blockchainStatus", "published"] }, 1, 0],
+            },
+          },
+        },
+      },
+    ]);
+
+    // If stats is empty, it means the user has no produce yet
+    return stats[0] || { totalValue: 0, totalItems: 0, activeListings: 0 };
+  } catch (error) {
+    console.error("Dashboard stats error:", error);
+    return { totalValue: 0, totalItems: 0, activeListings: 0 };
+  }
+}
+
+export async function getRecentActivities(userId: string) {
+  try {
+    await dbConnect();
+
+    const recentProduce = await Produce.find({
+      userId: new mongoose.Types.ObjectId(userId),
+    })
+      .sort({ updatedAt: -1 }) // Sort by last change
+      .limit(5)
+      .lean();
+
+    return recentProduce.map((item: any) => {
+      // Logic to determine if it was a new add or an edit
+      // If the difference between creation and update is > 2 seconds, call it an Edit
+      const isNew = Math.abs(item.updatedAt - item.createdAt) < 2000;
+
+      return {
+        id: item._id.toString(),
+        type: "Produce",
+        name: item.name,
+        action: isNew ? "Added New Entry" : "Updated Entry",
+        date: new Date(item.updatedAt).toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        }),
+        category: item.category,
+      };
+    });
+  } catch (error) {
+    console.error("Error fetching activities:", error);
+    return [];
   }
 }

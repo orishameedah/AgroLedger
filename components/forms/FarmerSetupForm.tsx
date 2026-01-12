@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Loader2, ChevronDown, ChevronUp, CalendarDays } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { SuccessMessage } from "../ui/SuccessMessage";
+import { useSession } from "next-auth/react";
 
 import { FARM_TYPES, NIGERIAN_STATES, DAYS_OF_WEEK } from "@/lib/constants";
 
@@ -18,6 +19,7 @@ export const FarmerSetupForm = ({ user }: { user: any }) => {
     message: "",
   });
 
+  const { data: session, update } = useSession();
   const [formData, setFormData] = useState({
     phoneNumber: "",
     farmName: "",
@@ -78,12 +80,32 @@ export const FarmerSetupForm = ({ user }: { user: any }) => {
       body: JSON.stringify(formData),
     });
 
+    // if (res.ok) {
+    //   setShowSuccess(true);
+    //   setTimeout(() => {
+    //     router.push("/farmer-dashboard");
+    //   }, 3000);
+    //   setLoading(false);
+    // }
+    // Inside your handleSubmit function in FarmerSetupForm.tsx
     if (res.ok) {
+      // 1. Tell the browser to refresh the session token
+      await update({
+        ...session,
+        user: {
+          ...session?.user,
+          isSetupComplete: true,
+        },
+      });
+
       setShowSuccess(true);
+
+      // 2. Wait a bit for the message, then redirect
       setTimeout(() => {
+        // router.refresh() is important here to clear the server-side cache
+        router.refresh();
         router.push("/farmer-dashboard");
-      }, 3000);
-      setLoading(false);
+      }, 2000);
     }
   };
 

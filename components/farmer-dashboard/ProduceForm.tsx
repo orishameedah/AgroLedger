@@ -6,11 +6,13 @@ import { PRODUCE_CATEGORIES, UNITS_BY_CATEGORY } from "@/lib/constants";
 interface ProduceFormFieldsProps {
   formData: any;
   setFormData: (data: any) => void;
+  availableCategories: string[]; // <--- NEW PROP fetches category based on farmer category
 }
 
 export function ProduceFormFields({
   formData,
   setFormData,
+  availableCategories,
 }: ProduceFormFieldsProps) {
   const unitLabel = formData.unit || "unit";
   const productName = formData.name || "this product";
@@ -45,7 +47,7 @@ export function ProduceFormFields({
           }
         >
           <option value="">Select Category</option>
-          {PRODUCE_CATEGORIES.map((cat) => (
+          {availableCategories.map((cat) => (
             <option key={cat} value={cat}>
               {cat}
             </option>
@@ -107,7 +109,7 @@ export function ProduceFormFields({
         </p>
         <input
           type="number"
-          // step="0.01"
+          step="0.01"
           required
           className="produce-input produce-input:focus"
           value={formData.pricePerUnit}

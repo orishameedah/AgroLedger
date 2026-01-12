@@ -90,9 +90,6 @@
     @apply border-slate-200 bg-slate-50/50;
   }
 
-  /* .button-form {
-      @apply w-full bg-green-700 hover:bg-green-800 text-white font-medium py-3 rounded-2xl transition-all shadow-lg shadow-green-900/20 active:scale-[0.98] cursor-pointer;
-    } */
   .button-form {
     @apply w-full bg-green-700 hover:bg-green-800 text-white font-medium py-3 rounded-2xl 
   transition-all shadow-lg shadow-green-900/20 active:scale-[0.98] cursor-pointer 
@@ -117,17 +114,6 @@
     @apply text-2xl font-bold text-slate-900 dark:text-white;
   }
 
-  /* .inventory-table-header {
-    @apply bg-slate-50 dark:bg-slate-900/50 text-slate-500 text-xs uppercase font-bold tracking-wider px-6 py-4;
-  }
-
-  .inventory-row {
-    @apply hover:bg-emerald-50/50 dark:hover:bg-emerald-900/10 border-b border-slate-100 dark:border-slate-800 transition-colors;
-  }
-
-  .status-badge-published {
-    @apply bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 px-3 py-1 rounded-full text-[10px] font-bold;
-  } */
   .inventory-table {
     @apply w-full text-left border-collapse;
   }
@@ -204,6 +190,41 @@
 
   .delete-msg {
     @apply flex-2 py-4 cursor-pointer bg-red-600 hover:bg-red-700 text-white rounded-xl font-extrabold shadow-lg shadow-red-100 dark:shadow-none transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50;
+  }
+
+  .settings-container {
+    @apply max-w-4xl space-y-8 pb-20;
+  }
+
+  .settings-card {
+    @apply rounded-[2.5rem] bg-white dark:bg-slate-900 shadow-sm overflow-hidden;
+  }
+
+  .settings-card-header {
+    @apply p-8 border-b border-slate-50 dark:border-slate-800 flex items-center gap-4;
+  }
+
+  .settings-card-content {
+    @apply p-8;
+  }
+
+  .settings-input {
+    @apply w-full p-4 rounded-2xl border border-slate-100 bg-slate-50 outline-none focus:ring-2 focus:ring-emerald-600 transition-all text-sm font-medium text-slate-700;
+  }
+
+  .settings-label {
+    @apply text-[11px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2 mb-2;
+  }
+
+  /* Update this in your globals.css */
+  .stats-card-container {
+    @apply w-full flex flex-col p-6 rounded-3xl border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm transition-all;
+    /* Remove any fixed widths like 'w-64' or 'min-w-[250px]' */
+  }
+
+  /* Ensure the grid doesn't have restrictive horizontal padding */
+  .dashboard-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6;
   }
 }
 

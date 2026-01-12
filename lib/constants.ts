@@ -2,7 +2,6 @@ export const FARM_TYPES = [
   "Livestock",
   "Crops",
   "Poultry",
-  "Fishery",
   "Dairy",
   "Organic",
   "Apiculture",
