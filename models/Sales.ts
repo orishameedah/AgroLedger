@@ -1,4 +1,3 @@
-// models/Sale.ts
 import mongoose from "mongoose";
 
 const SaleSchema = new mongoose.Schema(
@@ -8,22 +7,30 @@ const SaleSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    // Optional link: If imported, we store the ID. If manual, this stays null.
-    produceId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Produce",
-      required: false,
-    },
+    produceId: { type: mongoose.Schema.Types.ObjectId, ref: "Produce" },
     productName: { type: String, required: true },
     category: { type: String, required: true },
-    costPrice: { type: Number, required: true }, // Auto-filled from Produce.totalPrice or manual
-    amountSold: { type: Number, required: true }, // Total revenue from the sale
-    quantitySold: { type: Number, required: true },
-    unit: { type: String, required: true }, // e.g., "kg", "bags", "crates"
-    buyerNames: [{ type: String }], // Array to support multiple buyers
-    saleDate: { type: Date, required: true },
-    // Profit/Loss is calculated as (amountSold - costPrice)
-    profitAndLoss: { type: Number, required: true },
+    unit: { type: String, required: true },
+
+    // --- INVENTORY SNAPSHOT (The "Cool" Evaluation) ---
+    stockBeforeSale: { type: Number, required: true }, // e.g., 100
+    valuationBeforeSale: { type: Number, required: true }, // e.g., ₦12,560,000
+    unitPriceAtCost: { type: Number, required: true }, // e.g., ₦125,600
+
+    // --- SALE TOTALS (Calculated from Buyers) ---
+    totalQuantitySold: { type: Number, required: true }, // e.g., 2
+    totalAmountReceived: { type: Number, required: true }, // e.g., ₦250,800
+
+    saleDate: { type: Date, default: Date.now },
+
+    // --- BUYER LIST (Simplified) ---
+    buyers: [
+      {
+        name: { type: String, required: true },
+        quantity: { type: Number, required: true }, // e.g., 1
+        amountSold: { type: Number, required: true }, // e.g., ₦125,400 (The buyer's total)
+      },
+    ],
   },
   { timestamps: true }
 );

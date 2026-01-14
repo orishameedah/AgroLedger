@@ -288,9 +288,22 @@ function ProduceRow({ item, actions, activeMenu, setActiveMenu }: any) {
           {item.category}
         </span>
       </td>
-      <td className="inventory-td">
+      {/* <td className="inventory-td">
         {item.quantity}{" "}
         <span className="text-slate-400 text-xs">{item.unit}</span>
+      </td> */}
+      {/* --- UPDATED QUANTITY COLUMN --- */}
+      <td className="inventory-td">
+        {item.quantity <= 0 ? (
+          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black bg-red-100 text-red-600 uppercase tracking-widest animate-pulse">
+            Out of Stock
+          </span>
+        ) : (
+          <>
+            {item.quantity}{" "}
+            <span className="text-slate-400 text-xs">{item.unit}</span>
+          </>
+        )}
       </td>
       <td className="inventory-td">
         ₦{(item.pricePerUnit || 0).toLocaleString()}
@@ -358,7 +371,17 @@ function ProduceCard({ item, actions, activeMenu, setActiveMenu }: any) {
         </button>
       </div>
       <div className="grid grid-cols-3 gap-2 pt-4 border-t border-slate-100">
-        <DataPoint label="Qty" value={`${item.quantity} ${item.unit}`} />
+        {/* <DataPoint label="Qty" value={`${item.quantity} ${item.unit}`} /> */}
+        <div className="flex flex-col">
+          <p className="text-[9px] uppercase font-bold text-slate-400">Qty</p>
+          {item.quantity <= 0 ? (
+            <p className="text-[10px] font-black text-red-500 uppercase tracking-tighter">
+              Out of Stock
+            </p>
+          ) : (
+            <p className="text-xs font-bold text-slate-700">{`${item.quantity} ${item.unit}`}</p>
+          )}
+        </div>
         <DataPoint
           label="Price/Unit"
           value={`₦${(item.pricePerUnit || 0).toLocaleString()}`}
