@@ -15,6 +15,7 @@ import {
   getDashboardStats,
   getRecentActivities,
 } from "@/lib/actions/produce.actions";
+import { getTotalSales } from "@/lib/actions/sales.actions";
 import { useState, useEffect } from "react";
 
 export const HomeDashboard = () => {
@@ -25,18 +26,27 @@ export const HomeDashboard = () => {
     totalValue: 0,
     totalItems: 0,
     activeListings: 0,
+    totalSales: 0, // This will hold our calculated revenue
   });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadDashboardData() {
       if (session?.user?.id) {
-        const [statsData, activityData] = await Promise.all([
+        const [statsData, activityData, salesData] = await Promise.all([
           getDashboardStats(session.user.id),
           getRecentActivities(session.user.id),
+          getTotalSales(session.user.id),
         ]);
 
-        setStats(statsData);
+        // setStats(statsData);
+        // setActivities(activityData);
+        // setLoading(false);
+
+        setStats({
+          ...statsData,
+          totalSales: salesData.totalSales,
+        });
         setActivities(activityData);
         setLoading(false);
       }
@@ -122,8 +132,10 @@ export const HomeDashboard = () => {
           <div className="stats-card-icon bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600">
             <TrendingUp className="w-6 h-6" />
           </div>
-          <p className="stats-card-title">Total Sales Profit</p>
-          <h3 className="stats-card-value">₦0</h3>
+          <p className="stats-card-title">Total Sales</p>
+          <h3 className="stats-card-value">
+            {loading ? "..." : formatCurrency(stats.totalSales)}
+          </h3>
         </div>
 
         {/* Total Inventory Items */}
