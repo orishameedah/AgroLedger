@@ -88,9 +88,15 @@ export function AddProduceModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // STOP if there is no image. Don't show success, don't save.
+    if (!formData.image) {
+      return toast.error("Please upload an image first!");
+    }
+
     if (!session?.user?.id) return toast.error("User session not found.");
 
-    setIsSubmitting(true); // 1. Start loading
+    setIsSubmitting(true);
 
     try {
       const result = await saveProduce(
@@ -100,29 +106,21 @@ export function AddProduceModal({
 
       if (result.success) {
         setShowSuccess(true);
-
-        // 2. WAIT for the 3 seconds while KEEPING isSubmitting as true
         setTimeout(() => {
-          setIsSubmitting(false); // Only stop loading when the modal is about to close
+          setIsSubmitting(false);
           onClose();
         }, 3000);
       } else {
-        // If there's an error, we stop loading immediately so they can fix the form
-        toast.error(result.error || "Failed to save entry.");
+        toast.error("Failed to save.");
         setIsSubmitting(false);
       }
     } catch (error) {
-      toast.error("An unexpected error occurred.");
       setIsSubmitting(false);
     }
-    // DO NOT use a "finally" block here to set isSubmitting(false),
-    // because that would override our 3-second wait!
   };
 
   return (
     <>
-      <SuccessMessage isVisible={showSuccess} message="Success" />
-
       <AnimatePresence>
         {isOpen && (
           <div className="fixed inset-0 z-9999 flex items-center justify-center p-4 sm:p-6">
@@ -134,6 +132,7 @@ export function AddProduceModal({
               className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
             />
 
+            <SuccessMessage isVisible={showSuccess} message="Success" />
             <motion.div
               initial={{ scale: 0.95, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -162,12 +161,6 @@ export function AddProduceModal({
                 onSubmit={handleSubmit}
                 className="p-8 space-y-6 max-h-[75vh] overflow-y-auto"
               >
-                {/* 1. MOVED: Form Fields Component */}
-                {/* <ProduceFormFields
-                  formData={formData}
-                  setFormData={setFormData}
-                /> */}
-
                 <ProduceFormFields
                   formData={formData}
                   setFormData={setFormData}
@@ -207,21 +200,22 @@ export function AddProduceModal({
                   >
                     Cancel
                   </button>
+
                   <button
                     type="submit"
-                    disabled={isSubmitting}
-                    className="flex-2 py-4 cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-extrabold shadow-lg transition-all flex items-center justify-center gap-2"
+                    disabled={isSubmitting || !formData.image} // Locks the button
+                    className={`flex-2 py-4 rounded-2xl cursor-pointer font-extrabold transition-all flex items-center justify-center gap-2 ${
+                      !formData.image || isSubmitting
+                        ? "bg-slate-200 text-slate-400 cursor-not-allowed" // Gray state
+                        : "bg-emerald-600 hover:bg-emerald-700 text-white" // Active state
+                    }`}
                   >
                     {isSubmitting ? (
-                      <>
-                        <Loader2 className="w-5 h-5 animate-spin" /> Saving...
-                      </>
+                      <Loader2 className="animate-spin" />
                     ) : (
-                      <>
-                        <Plus className="w-5 h-5 cursor-pointer" />{" "}
-                        {editingEntry ? "Update Records" : "Confirm Entry"}
-                      </>
+                      <Plus />
                     )}
+                    {editingEntry ? "Update Records" : "Confirm Entry"}
                   </button>
                 </div>
               </form>

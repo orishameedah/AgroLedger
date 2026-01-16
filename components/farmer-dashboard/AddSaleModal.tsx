@@ -58,7 +58,7 @@ export function AddSaleModal({ isOpen, onClose, editingSale }: any) {
   const errorMessage = isOutOfStock
     ? "This item is completely out of stock!"
     : isExceeded
-    ? `Quantity exceeded! You only have ${trueLimit} units available.`
+    ? `Quantity exceeded! You only have ${selectedProduce.quantity} ${selectedProduce.unit} available.`
     : null;
 
   // 5. Button Lock Logic: Requires a Name and at least 1 unit sold
@@ -160,13 +160,12 @@ export function AddSaleModal({ isOpen, onClose, editingSale }: any) {
       setIsSubmitting(false);
     }
   };
-
   return (
     <>
-      <SuccessMessage
+      {/* <SuccessMessage
         isVisible={showSuccess}
         message="Sales Report Processed"
-      />
+      /> */}
       <AnimatePresence>
         {isOpen && (
           <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
@@ -175,6 +174,7 @@ export function AddSaleModal({ isOpen, onClose, editingSale }: any) {
               animate={{ scale: 1, opacity: 1 }}
               className="bg-white dark:bg-slate-900 w-full max-w-4xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
             >
+              {/* 1. FIXED HEADER */}
               <div className="p-8 border-b flex justify-between items-center bg-slate-50/50">
                 <h2 className="text-2xl font-black">
                   {editingSale ? "Edit Sales Record" : "New Sale Entry"}
@@ -185,15 +185,18 @@ export function AddSaleModal({ isOpen, onClose, editingSale }: any) {
                 />
               </div>
 
-              <form
-                onSubmit={handleSubmit}
-                className="p-8 space-y-8 overflow-y-auto"
-              >
+              <SuccessMessage
+                isVisible={showSuccess}
+                message="Sales Report Processed"
+              />
+
+              <AnimatePresence>
                 {errorMessage && (
                   <motion.div
-                    initial={{ opacity: 0, y: -20 }}
+                    initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="bg-red-600 p-5 rounded-3xl flex items-center gap-4 border border-red-500 shadow-xl shadow-red-100 dark:shadow-none"
+                    exit={{ opacity: 0, y: 20 }}
+                    className="bg-red-600 p-5 rounded-3xl flex items-center gap-4 border border-red-500 shadow-xl mb-4"
                   >
                     <div className="p-2 bg-white/20 rounded-xl text-white">
                       <Info size={24} />
@@ -209,6 +212,12 @@ export function AddSaleModal({ isOpen, onClose, editingSale }: any) {
                     </div>
                   </motion.div>
                 )}
+              </AnimatePresence>
+
+              <form
+                onSubmit={handleSubmit}
+                className="p-8 space-y-8 overflow-y-auto"
+              >
                 {/* SECTION 1: IMPORT & SNAPSHOT */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {!editingSale && (
@@ -273,8 +282,6 @@ export function AddSaleModal({ isOpen, onClose, editingSale }: any) {
                       placeholder="e.g. Maize"
                     />
                   </div>
-
-                  {/* NEW: Unit Field for Manual Entry */}
                   <div className="space-y-1">
                     <label className="text-[9px] font-bold text-slate-400 uppercase ml-1">
                       Unit
@@ -288,7 +295,6 @@ export function AddSaleModal({ isOpen, onClose, editingSale }: any) {
                       placeholder="e.g. bags / kg"
                     />
                   </div>
-
                   <div className="space-y-1">
                     <label className="text-[9px] font-bold text-slate-400 uppercase ml-1">
                       Category
@@ -317,7 +323,7 @@ export function AddSaleModal({ isOpen, onClose, editingSale }: any) {
                   </div>
                 </div>
 
-                {/* SECTION 3: SPREADSHEET (Responsive Rows) */}
+                {/* SECTION 3: SPREADSHEET */}
                 <div className="space-y-4">
                   <div className="flex justify-between items-center px-1">
                     <label className="text-xs font-bold text-slate-500 uppercase">
@@ -331,12 +337,12 @@ export function AddSaleModal({ isOpen, onClose, editingSale }: any) {
                           { name: "", quantity: "", amountSold: "" },
                         ])
                       }
-                      className="text-[10px] font-bold text-emerald-600 bg-emerald-50 hover:bg-emerald-100 px-4 py-2 rounded-full transition-all"
+                      className="text-[10px] cursor-pointer font-bold text-emerald-600 bg-emerald-50 hover:bg-emerald-100 px-4 py-2 rounded-full transition-all"
                     >
                       + Add Another Buyer
                     </button>
                   </div>
-                  <div className="space-y-3">
+                  <div className="space-y-3 pb-4">
                     {buyers.map((b, i) => (
                       <BuyerRow
                         key={i}
@@ -357,7 +363,12 @@ export function AddSaleModal({ isOpen, onClose, editingSale }: any) {
                     <p className="text-[10px] opacity-50 font-bold uppercase tracking-widest">
                       Total Quantity Deducted
                     </p>
-                    <p className="text-2xl font-black">
+                    {/* Visual Signifier: Change totalQty color to red if exceeded */}
+                    <p
+                      className={`text-2xl font-black transition-colors ${
+                        isExceeded ? "text-red-400" : "text-white"
+                      }`}
+                    >
                       {totalQty}{" "}
                       <span className="text-xs opacity-50">
                         {formData.unit || "Units"}
@@ -379,31 +390,14 @@ export function AddSaleModal({ isOpen, onClose, editingSale }: any) {
                   <button
                     type="button"
                     onClick={onClose}
-                    className="flex-1 py-5 font-bold text-slate-400 hover:bg-slate-100 rounded-3xl transition-colors"
+                    className="flex-1 py-5 cursor-pointer font-bold text-slate-400 hover:bg-slate-100 rounded-3xl transition-colors"
                   >
                     Cancel
                   </button>
-                  {/* <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="flex-2 py-5 bg-emerald-600 text-white font-black rounded-3xl shadow-lg flex items-center justify-center gap-3 transition-transform active:scale-95"
-                  >
-                    {isSubmitting ? (
-                      <Loader2 className="animate-spin" />
-                    ) : (
-                      <>
-                        <Save size={20} />{" "}
-                        {editingSale
-                          ? "Update Report"
-                          : "Confirm & Sync Inventory"}
-                      </>
-                    )}
-                  </button> */}
                   <button
                     type="submit"
-                    // Locked if submitting, if there's a stock error, or if name/qty is missing
                     disabled={isSubmitting || isInvalid}
-                    className={`flex-2 py-5 font-black rounded-3xl shadow-lg flex items-center justify-center gap-3 transition-all ${
+                    className={`flex-2 py-5 font-black rounded-3xl shadow-lg cursor-pointer flex items-center justify-center gap-3 transition-all ${
                       isInvalid
                         ? "bg-slate-200 text-slate-400 cursor-not-allowed shadow-none"
                         : "bg-emerald-600 text-white active:scale-95 shadow-emerald-100"

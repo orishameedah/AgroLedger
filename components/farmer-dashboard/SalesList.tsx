@@ -82,24 +82,27 @@ export function SalesList() {
 
   return (
     <div className="space-y-6">
-      <header className="flex flex-col md:flex-row justify-between items-center gap-4 bg-white dark:bg-slate-900 p-6 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm">
-        <div className="relative w-full md:max-w-md">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-          <input
-            className="produce-search w-full pl-12 h-12"
-            placeholder="Search sales or buyers..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+      <header className="produce-header">
+        <div className="flex items-center gap-3 flex-1 min-w-60">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Search sales or buyers..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="produce-search produce-search:focus"
+            />
+          </div>
         </div>
         <button
           onClick={() => {
             setEditingItem(null);
             setIsModalOpen(true);
           }}
-          className="produce-add w-full md:w-auto h-12"
+          className="produce-add curso w-full text-center md:w-auto h-12"
         >
-          <Plus size={18} /> New Sale Entry
+          <Plus size={18} className="text-center" /> New Sale Entry
         </button>
       </header>
 
@@ -108,13 +111,13 @@ export function SalesList() {
         <table className="w-full text-left overflow-visible">
           <thead className="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
             <tr className="text-[10px] uppercase font-black text-slate-400 tracking-[0.12em]">
-              <th className="px-6 py-6">Produce</th>
-              <th className="px-6 py-6">Category</th>
-              <th className="px-6 py-6">Stock Out</th>
-              <th className="px-6 py-6">Amount Received</th>
-              <th className="px-6 py-6">Buyer Summary</th>
-              <th className="px-6 py-6">Date</th>
-              <th className="px-6 py-6 text-center">Actions</th>
+              <th className="p-4">Produce</th>
+              <th className="p-4">Category</th>
+              <th className="p-4">Stock Out</th>
+              <th className="p-4">Amount Received</th>
+              <th className="p-4">Buyer Summary</th>
+              <th className="p-4">Date</th>
+              <th className="p-4 text-center">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
@@ -156,12 +159,12 @@ export function SalesList() {
 
       <UniversalDeleteModal
         isOpen={isDeleteOpen}
-        title="Void Sale"
+        title="Delete Sale"
         description="Returning items to inventory..."
         onClose={() => setIsDeleteOpen(false)}
         onConfirm={async () => {
           await deleteSale(itemToDelete!);
-          toast.success("Voided");
+          toast.success("Sales deleted successfully");
           loadData();
           setIsDeleteOpen(false);
         }}
@@ -186,9 +189,6 @@ function SaleRow({ sale, actions, activeMenu, setActiveMenu }: any) {
           <span className="font-bold text-slate-700 dark:text-slate-300">
             {sale.totalQuantitySold} {sale.unit}
           </span>
-          {/* <span className="text-[9px] text-slate-400 font-medium italic">
-            Prev: {sale.stockBeforeSale}
-          </span> */}
         </div>
       </td>
       <td className="px-6 py-5">
@@ -198,7 +198,7 @@ function SaleRow({ sale, actions, activeMenu, setActiveMenu }: any) {
       </td>
       <td className="px-6 py-5">
         <div className="flex items-center gap-2">
-          <Users size={12} className="text-slate-300" />
+          <Users size={12} className="text-slate-500" />
           <span className="text-xs text-slate-600 dark:text-slate-400">
             {sale.buyers[0]?.name || "Cash"}{" "}
             {sale.buyers.length > 1 && `+${sale.buyers.length - 1}`}
@@ -213,7 +213,7 @@ function SaleRow({ sale, actions, activeMenu, setActiveMenu }: any) {
           onClick={() =>
             setActiveMenu(activeMenu === sale._id ? null : sale._id)
           }
-          className="p-2 text-slate-300 hover:text-slate-600"
+          className="p-2 text-slate-300 cursor-pointer hover:text-slate-600"
         >
           <MoreVertical size={18} className="mx-auto" />
         </button>
@@ -249,7 +249,7 @@ function SaleCard({ sale, actions, activeMenu, setActiveMenu }: any) {
           onClick={() =>
             setActiveMenu(activeMenu === sale._id ? null : sale._id)
           }
-          className="p-2 text-slate-300"
+          className="p-2 text-slate-300 cursor-pointer"
         >
           <MoreVertical size={20} />
         </button>

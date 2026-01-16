@@ -288,10 +288,6 @@ function ProduceRow({ item, actions, activeMenu, setActiveMenu }: any) {
           {item.category}
         </span>
       </td>
-      {/* <td className="inventory-td">
-        {item.quantity}{" "}
-        <span className="text-slate-400 text-xs">{item.unit}</span>
-      </td> */}
       {/* --- UPDATED QUANTITY COLUMN --- */}
       <td className="inventory-td">
         {item.quantity <= 0 ? (

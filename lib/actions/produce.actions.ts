@@ -125,38 +125,3 @@ export async function getDashboardStats(userId: string) {
     return { totalValue: 0, totalItems: 0, activeListings: 0 };
   }
 }
-
-export async function getRecentActivities(userId: string) {
-  try {
-    await dbConnect();
-
-    const recentProduce = await Produce.find({
-      userId: new mongoose.Types.ObjectId(userId),
-    })
-      .sort({ updatedAt: -1 }) // Sort by last change
-      .limit(5)
-      .lean();
-
-    return recentProduce.map((item: any) => {
-      // Logic to determine if it was a new add or an edit
-      // If the difference between creation and update is > 2 seconds, call it an Edit
-      const isNew = Math.abs(item.updatedAt - item.createdAt) < 2000;
-
-      return {
-        id: item._id.toString(),
-        type: "Produce",
-        name: item.name,
-        action: isNew ? "Added New Entry" : "Updated Entry",
-        date: new Date(item.updatedAt).toLocaleDateString("en-US", {
-          month: "short",
-          day: "numeric",
-          year: "numeric",
-        }),
-        category: item.category,
-      };
-    });
-  } catch (error) {
-    console.error("Error fetching activities:", error);
-    return [];
-  }
-}

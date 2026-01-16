@@ -71,7 +71,7 @@ export function ImageUpload({
               </div>
             </div>
             <p className="text-sm font-bold text-emerald-600 truncate max-w-50">
-              {fileName || "Uploaded"}
+              Remove and change
             </p>
           </div>
         ) : (

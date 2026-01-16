@@ -176,3 +176,63 @@ export async function getTotalSales(userId: string) {
     return { success: false, totalSales: 0 };
   }
 }
+
+export async function getRecentActivities(userId: string) {
+  try {
+    await dbConnect();
+    const userObjId = new mongoose.Types.ObjectId(userId);
+
+    // 1. Fetch Recent Produce (Lean for plain objects)
+    const recentProduce = await Produce.find({ userId: userObjId })
+      .sort({ updatedAt: -1 })
+      .limit(4)
+      .lean();
+
+    // 2. Fetch Recent Sales (Lean for plain objects)
+    const recentSales = await Sale.find({ userId: userObjId })
+      .sort({ updatedAt: -1 })
+      .limit(3)
+      .lean();
+
+    // 3. Map Produce to a plain format
+    const produceActivities = recentProduce.map((item: any) => ({
+      id: item._id.toString(), // CRITICAL: Convert Buffer to String
+      type: "Produce",
+      name: item.name,
+      action:
+        Math.abs(item.updatedAt - item.createdAt) < 2000
+          ? "Added New Entry"
+          : "Updated Entry",
+      date: new Date(item.updatedAt).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      }),
+      category: item.category,
+    }));
+
+    // 4. Map Sales to a plain format
+    const salesActivities = recentSales.map((item: any) => ({
+      id: item._id.toString(), // CRITICAL: Convert Buffer to String
+      type: "Sale",
+      name: item.productName, // Using the sales field name
+      action: "New Sale Recorded",
+      date: new Date(item.updatedAt).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      }),
+      category: item.category,
+    }));
+
+    // 5. Combine and Sort by the newest first
+    const combinedActivities = [...produceActivities, ...salesActivities].sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
+
+    return combinedActivities.slice(0, 7); // Return the top 5 total
+  } catch (error) {
+    console.error("Error fetching activities:", error);
+    return [];
+  }
+}

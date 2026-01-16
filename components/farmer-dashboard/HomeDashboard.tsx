@@ -13,8 +13,9 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import {
   getDashboardStats,
-  getRecentActivities,
+  // getRecentActivities,
 } from "@/lib/actions/produce.actions";
+import { getRecentActivities } from "../../lib/actions/sales.actions";
 import { getTotalSales } from "@/lib/actions/sales.actions";
 import { useState, useEffect } from "react";
 
@@ -192,7 +193,7 @@ export const HomeDashboard = () => {
                     </td>
                     <td className="px-6 py-4">
                       <span className="text-[10px] font-bold uppercase px-2 py-1 rounded-full bg-blue-100 text-blue-600">
-                        {activity.category}
+                        {activity.type === "Sale" ? "Sales" : "Product"}
                       </span>
                     </td>
                   </tr>
@@ -221,7 +222,7 @@ export const HomeDashboard = () => {
                   <p className="text-xs text-slate-500">{activity.name}</p>
                 </div>
                 <span className="text-[9px] font-black uppercase px-2 py-1 rounded-lg bg-blue-100 text-blue-600">
-                  {activity.category}
+                  {activity.type === "Sale" ? "Sales" : "Product"}
                 </span>
               </div>
               <div className="flex justify-between items-center text-[10px] text-slate-400">

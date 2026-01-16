@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { DashboardLayout } from "@/components/farmer-dashboard/DashboardLayout";
 import { redirect } from "next/navigation";
+import { Toaster } from "react-hot-toast"; // 1. Add this import
 
 export default async function Layout({
   children,
@@ -15,5 +16,10 @@ export default async function Layout({
     redirect("/login/farmer");
   }
 
-  return <DashboardLayout user={session.user}>{children}</DashboardLayout>;
+  return (
+    <DashboardLayout user={session.user}>
+      <Toaster />
+      {children}
+    </DashboardLayout>
+  );
 }
