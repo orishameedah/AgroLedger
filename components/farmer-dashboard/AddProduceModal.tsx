@@ -101,15 +101,13 @@ export function AddProduceModal({
     try {
       const result = await saveProduce(
         { ...formData, id: editingEntry?._id },
-        session.user.id
+        session.user.id,
       );
 
       if (result.success) {
-        setShowSuccess(true);
-        setTimeout(() => {
-          setIsSubmitting(false);
-          onClose();
-        }, 3000);
+        setIsSubmitting(false);
+        onClose();
+        toast.success("Produce saved successfully!");
       } else {
         toast.error("Failed to save.");
         setIsSubmitting(false);
@@ -131,8 +129,6 @@ export function AddProduceModal({
               onClick={onClose}
               className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
             />
-
-            <SuccessMessage isVisible={showSuccess} message="Success" />
             <motion.div
               initial={{ scale: 0.95, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}

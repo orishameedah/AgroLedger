@@ -13,7 +13,7 @@ import {
   Edit2,
 } from "lucide-react";
 import toast from "react-hot-toast";
-
+import { Pagination } from "../ui/Pagination";
 import { fetchSalesHistory, deleteSale } from "@/lib/actions/sales.actions";
 import { ActionDropdown } from "../ui/ActionDropDown";
 import { UniversalDeleteModal } from "../ui/DeleteConfirmation";
@@ -24,6 +24,9 @@ export function SalesList() {
   const [sales, setSales] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
 
   const [editingItem, setEditingItem] = useState<any>(null);
@@ -67,11 +70,16 @@ export function SalesList() {
     (s) =>
       s.productName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       s.buyers.some((b: any) =>
-        b.name.toLowerCase().includes(searchQuery.toLowerCase())
+        b.name.toLowerCase().includes(searchQuery.toLowerCase()),
       ) ||
       s.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      s.unit.toLowerCase().includes(searchQuery.toLowerCase())
+      s.unit.toLowerCase().includes(searchQuery.toLowerCase()),
   );
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredSales.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredSales.length / itemsPerPage);
 
   if (isLoading)
     return (
@@ -115,13 +123,14 @@ export function SalesList() {
               <th className="p-4">Category</th>
               <th className="p-4">Stock Out</th>
               <th className="p-4">Amount Received</th>
-              <th className="p-4">Buyer Summary</th>
+              <th className="p-4">Buyer Names</th>
               <th className="p-4">Date</th>
               <th className="p-4 text-center">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
-            {filteredSales.map((sale) => (
+            {/* {filteredSales.map((sale) => ( */}
+            {currentItems.map((sale) => (
               <SaleRow
                 key={sale._id}
                 sale={sale}
@@ -136,7 +145,8 @@ export function SalesList() {
 
       {/* --- MOBILE CARDS (FULLY RESPONSIVE) --- */}
       <div className="md:hidden space-y-4 px-1">
-        {filteredSales.map((sale) => (
+        {/* {filteredSales.map((sale) => ( */}
+        {currentItems.map((sale) => (
           <SaleCard
             key={sale._id}
             sale={sale}
@@ -146,6 +156,12 @@ export function SalesList() {
           />
         ))}
       </div>
+
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={(page) => setCurrentPage(page)}
+      />
 
       <AddSaleModal
         isOpen={isModalOpen}
@@ -175,7 +191,8 @@ export function SalesList() {
 
 function SaleRow({ sale, actions, activeMenu, setActiveMenu }: any) {
   return (
-    <tr className="hover:bg-slate-50/30 transition-colors group">
+    // <tr className="hover:bg-slate-50/30 transition-colors group">
+    <tr className="inventory-row">
       <td className="px-6 py-5 font-bold text-slate-900 dark:text-white">
         {sale.productName}
       </td>
@@ -205,8 +222,15 @@ function SaleRow({ sale, actions, activeMenu, setActiveMenu }: any) {
           </span>
         </div>
       </td>
-      <td className="px-6 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
-        {new Date(sale.saleDate).toLocaleDateString()}
+      <td className="px-6 py-5 text-[10px] font-bold text-slate-400  tracking-tighter">
+        {/* {new Date(sale.saleDate).toLocaleDateString()} */}
+        {sale.saleDate
+          ? new Date(sale.saleDate).toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            })
+          : "No Date"}
       </td>
       <td className="px-6 py-5 text-center relative">
         <button
@@ -283,11 +307,25 @@ function SaleCard({ sale, actions, activeMenu, setActiveMenu }: any) {
 
       <div className="mt-4 flex justify-between items-center">
         <div className="flex items-center gap-1.5 text-[9px] font-black text-slate-400 uppercase tracking-widest">
-          <Calendar size={12} /> {new Date(sale.saleDate).toLocaleDateString()}
+          <Calendar size={12} />{" "}
+          {sale.saleDate
+            ? new Date(sale.saleDate).toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              })
+            : "No Date"}
         </div>
-        <div className="bg-slate-50 dark:bg-slate-800/50 px-3 py-1 rounded-full text-[9px] font-bold text-slate-500 uppercase">
+        <div className="flex items-center gap-2">
+          <Users size={12} className="text-slate-500" />
+          <span className="text-xs text-slate-600 dark:text-slate-400">
+            {sale.buyers[0]?.name || "Cash"}{" "}
+            {sale.buyers.length > 1 && `+${sale.buyers.length - 1}`}
+          </span>
+        </div>
+        {/* <div className="bg-slate-50  dark:bg-slate-800/50 px-3 py-1 rounded-full text-[9px] font-bold text-slate-500 uppercase">
           {sale.buyers.length} Transactions
-        </div>
+        </div> */}
       </div>
     </div>
   );
