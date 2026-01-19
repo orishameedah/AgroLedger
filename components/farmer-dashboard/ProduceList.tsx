@@ -15,7 +15,7 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { fetchAllProduce, deleteProduce } from "@/lib/actions/produce.actions";
 import { Loader2 } from "lucide-react";
-import Image from "next/image";
+import { Pagination } from "../ui/Pagination";
 import toast from "react-hot-toast";
 import { UniversalDeleteModal } from "../ui/DeleteConfirmation";
 
@@ -65,7 +65,7 @@ export function ProduceList() {
     (item) =>
       item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.unit.toLowerCase().includes(searchQuery.toLowerCase())
+      item.unit.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   // New Pagination Logic
@@ -115,6 +115,10 @@ export function ProduceList() {
     }
     setIsDeleting(false);
   };
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
 
   if (isLoading) {
     return (
@@ -200,29 +204,12 @@ export function ProduceList() {
             ))}
           </div>
 
-          {totalPages > 1 && (
-            <div className="produce-totalPages">
-              <button
-                disabled={currentPage === 1}
-                onClick={() => setCurrentPage((prev) => prev - 1)}
-                className="px-4 py-2 text-sm font-bold text-slate-500 hover:text-emerald-600 disabled:opacity-30 transition-colors cursor-pointer;"
-              >
-                Previous
-              </button>
-
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
-                Page {currentPage} of {totalPages}
-              </span>
-
-              <button
-                disabled={currentPage === totalPages}
-                onClick={() => setCurrentPage((prev) => prev + 1)}
-                className="px-4 py-2 text-sm font-bold text-slate-500 hover:text-emerald-600 disabled:opacity-30 transition-colors cursor-pointer;"
-              >
-                Next
-              </button>
-            </div>
-          )}
+          {/* --- PAGINATION CONTROLS --- */}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={(page) => setCurrentPage(page)}
+          />
         </>
       )}
 
@@ -257,8 +244,8 @@ const StatusRing = ({ status, image }: { status: string; image: string }) => (
         status === "published"
           ? "border-emerald-500 shadow-sm"
           : status === "processing"
-          ? "border-blue-500 animate-pulse"
-          : "border-slate-200 dark:border-slate-700 shadow-inner"
+            ? "border-blue-500 animate-pulse"
+            : "border-slate-200 dark:border-slate-700 shadow-inner"
       }`}
       alt="img"
     />
@@ -268,8 +255,8 @@ const StatusRing = ({ status, image }: { status: string; image: string }) => (
           status === "published"
             ? "bg-emerald-500"
             : status === "processing"
-            ? "bg-blue-500"
-            : "bg-slate-300 dark:bg-slate-600" // New Gray dot for "none"
+              ? "bg-blue-500"
+              : "bg-slate-300 dark:bg-slate-600" // New Gray dot for "none"
         }`}
       />
     )}
