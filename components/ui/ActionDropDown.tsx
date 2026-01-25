@@ -1,5 +1,3 @@
-// 0
-
 "use client";
 
 import React from "react";
@@ -25,30 +23,33 @@ export function ActionDropdown({
   isMobile,
   actions,
 }: ActionDropdownProps) {
-  const statusConfig = status
-    ? {
-        published: {
-          color: "text-emerald-500",
-          icon: CheckCircle2,
-          label: "Published",
-        },
-        processing: {
-          color: "text-blue-500",
-          icon: Clock,
-          label: "Processing...",
-        },
-        none: {
-          color: "text-slate-400",
-          icon: XCircle,
-          label: "Not published",
-        },
-      }[status.toLowerCase() as "published" | "processing" | "none"] || {
-        color: "text-slate-400",
-        icon: XCircle,
-        label: "Draft",
-      }
-    : null;
+  const configs = {
+    published: {
+      color: "text-emerald-500",
+      icon: CheckCircle2,
+      label: "Published",
+    },
+    sync: {
+      color: "text-amber-500",
+      icon: Clock,
+      label: "Update Needed",
+    },
+    processing: {
+      color: "text-blue-500",
+      icon: Clock,
+      label: "Processing...",
+    },
+    none: {
+      color: "text-slate-400",
+      icon: XCircle,
+      label: "Not published",
+    },
+  };
 
+  // This is the magic line that fixes the error
+  const statusKey = status?.toLowerCase() as keyof typeof configs;
+
+  const statusConfig = statusKey ? configs[statusKey] : null;
   return (
     <>
       {/* 1. THE SCREEN GUARD: Invisible backdrop to handle "clicking out" */}
@@ -95,8 +96,8 @@ export function ActionDropdown({
                 isDanger
                   ? "text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
                   : isSuccess
-                  ? "text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 font-bold"
-                  : "text-slate-600 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 hover:text-emerald-700"
+                    ? "text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 font-bold"
+                    : "text-slate-600 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 hover:text-emerald-700"
               }`}
             >
               <Icon className="w-4 h-4" />

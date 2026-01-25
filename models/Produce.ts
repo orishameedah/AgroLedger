@@ -32,6 +32,10 @@ const ProduceSchema = new Schema(
     lastSyncedAt: { type: Date }, // To show "Verified 2 hours ago"
 
     isArchived: { type: Boolean, default: false }, // For "Deleting" without losing data
+    lastPublishedSnapshot: {
+      quantity: { type: Number },
+      pricePerUnit: { type: Number },
+    },
   },
   {
     timestamps: true, // Automatically adds createdAt and updatedAt

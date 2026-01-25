@@ -1,0 +1,39 @@
+{
+  "_format": "hh3-sol-build-info-1",
+  "id": "solc-0_8_28-dfb2ccd8762d30785f5f7f4f784dab6b7ea9489e",
+  "solcVersion": "0.8.28",
+  "solcLongVersion": "0.8.28+commit.7893614a",
+  "userSourceNameMap": {
+    "contracts/AgroLedgerProduce.sol": "project/contracts/AgroLedgerProduce.sol"
+  },
+  "input": {
+    "language": "Solidity",
+    "settings": {
+      "evmVersion": "cancun",
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "outputSelection": {
+        "*": {
+          "": [
+            "ast"
+          ],
+          "*": [
+            "abi",
+            "evm.bytecode",
+            "evm.deployedBytecode",
+            "evm.methodIdentifiers",
+            "metadata"
+          ]
+        }
+      },
+      "remappings": []
+    },
+    "sources": {
+      "project/contracts/AgroLedgerProduce.sol": {
+        "content": "// SPDX-License-Identifier: MIT\n// This is a license identifier, allowing others to use this code under MIT terms (open-source).\n\npragma solidity ^0.8.20;\n// Tells the compiler to use Solidity version 0.8.20 or higher (but not 0.9.x due to ^).\n\ncontract AgroledgerProduce {\n    // Defines the smart contract named Agroledger. All code inside {} is part of it.\n\n    struct Listing {\n        // A custom data type (struct) to group related data for a produce listing.\n        string produceId;  // A text string for the unique ID of the produce (e.g., \"apple123\").\n        uint256 price;     // The price in wei (smallest Ethereum unit, like cents).\n        uint256 quantity;  // How much produce (e.g., 50 units).\n        uint256 timestamp; // When the listing was created (seconds since 1970).\n        address syncedBy;  // The blockchain address of who created the listing (like a signature).\n    }\n\n    mapping(string => Listing) public listings;\n    // A public mapping (like a dictionary): keys are strings (produceId), values are Listing structs.\n    // Anyone can read this data. It stores all listings by their ID.\n\n    // Example of this mapping is something like this:\n    // \"65fd2ab3...\" → {\n    //             price: 22000,\n    //             quantity: 50,\n    //             timestamp: Jan 15, 2026\n    //         }\n    // This is just a comment showing how the mapping might look in use.\n\n    event ListingSynced(\n        // Defines an event (a log/notification) emitted when a listing is synced.\n        string indexed produceId,  // The produce ID (indexed for efficient searching).\n        uint256 price,             // The price value.\n        uint256 quantity,          // The quantity value.\n        address syncedBy           // The address that synced it.\n    );\n\n    function syncProduce(\n        // Defines a public function to add/update a produce listing.\n        string memory _produceId,  // Input: the produce ID (stored in memory, not permanently).\n        uint256 _price,            // Input: the price (uint256 is a large positive number).\n        uint256 _qty               // Input: the quantity.\n    ) public {\n        // Function body starts here. 'public' means anyone can call it.\n\n        require(bytes(_produceId).length > 0, \"ID required\");\n        // Checks if the produceId is not empty. If empty, stops execution with error message.\n\n        require(_price > 0, \"Price must be > 0\");\n        // Checks if price is positive. If not, stops with error.\n\n        // Ensure quantity is valid\n        require(_qty > 0, \"Quantity must be > 0 to publish\");\n        // Checks if quantity is positive. If not, stops with error.\n\n        listings[_produceId] = Listing({\n            // Assigns a new Listing struct to the mapping at key _produceId.\n            produceId: _produceId,     // Sets the ID.\n            price: _price,             // Sets the price.\n            quantity: _qty,            // Sets the quantity.\n            timestamp: block.timestamp, // Sets to current block time (when transaction mined).\n            syncedBy: msg.sender       // Sets to the caller's address (who called the function).\n        });\n\n        emit ListingSynced(_produceId, _price, _qty, msg.sender);\n        // Emits the event to log the action on the blockchain.\n    }\n\n    function getListing(string memory _produceId) public view returns (Listing memory) {\n        // Defines a public view function to retrieve a listing. 'view' means it only reads data.\n        // Takes a produceId and returns the full Listing struct (in memory).\n        return listings[_produceId];\n        // Returns the Listing from the mapping for the given ID. If ID doesn't exist, returns default (empty) values.\n    }\n}"
+      }
+    }
+  }
+}

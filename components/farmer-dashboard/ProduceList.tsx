@@ -6,18 +6,24 @@ import {
   Trash2,
   Globe,
   Search,
-  Filter,
   Plus,
+  EyeOff,
 } from "lucide-react";
 import { ActionDropdown } from "../ui/ActionDropDown";
 import { AddProduceModal } from "./AddProduceModal";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { fetchAllProduce, deleteProduce } from "@/lib/actions/produce.actions";
+import {
+  fetchAllProduce,
+  deleteProduce,
+  publishProduceToBlockchain,
+  unpublishProduce,
+} from "@/lib/actions/produce.actions";
 import { Loader2 } from "lucide-react";
 import { Pagination } from "../ui/Pagination";
 import toast from "react-hot-toast";
 import { UniversalDeleteModal } from "../ui/DeleteConfirmation";
+import { getProduceSyncStatus } from "@/lib/utils/Produce";
 
 export function ProduceList() {
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
@@ -32,32 +38,63 @@ export function ProduceList() {
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // 2. The Confirm Logic
+  const getActions = (item: any) => {
+    // Use your utility to determine the current sync state
+    const { isOutOfSync } = getProduceSyncStatus(item);
 
-  // Helper to generate actions for any view (Desktop or Mobile)
-  const getActions = (item: any) => [
-    {
-      label: "Edit Entry",
-      icon: Edit2,
-      onClick: () => handleEdit(item),
-    },
-    {
-      label: "Delete Entry",
-      icon: Trash2,
-      onClick: () => {
-        setItemToDelete(item._id);
-        setIsDeleteModalOpen(true);
+    const actions: any[] = [
+      {
+        label: "Edit Entry",
+        icon: Edit2,
+        onClick: () => handleEdit(item),
       },
-      variant: "danger" as const,
-    },
-    {
-      label: item.status === "published" ? "Unpublish" : "Publish to Market",
-      icon: Globe,
-      onClick: () => console.log("Blockchain", item._id),
-      variant: "success" as const,
-    },
-  ];
+      {
+        label: "Delete Entry",
+        icon: Trash2,
+        onClick: () => {
+          setItemToDelete(item._id);
+          setIsDeleteModalOpen(true);
+        },
+        variant: "danger" as const,
+      },
+    ];
 
+    // BLOCKCHAIN LOGIC
+    if (item.blockchainStatus === "processing") {
+      actions.push({
+        label: "Blockchain Processing...",
+        icon: Loader2,
+        onClick: () => {}, // Disable interaction while processing
+        variant: "default",
+      });
+    } else if (!item.isPublished) {
+      // SCENARIO: Not yet on the market
+      actions.push({
+        label: "Publish to Market",
+        icon: Globe,
+        onClick: () => handlePublish(item._id),
+        variant: "success",
+      });
+    } else if (isOutOfSync) {
+      // SCENARIO: Published but data changed (Price/Qty mismatch)
+      actions.push({
+        label: "Sync Changes",
+        icon: Globe,
+        onClick: () => handlePublish(item._id), // Calls the same action to update snapshot
+        variant: "success",
+      });
+    } else {
+      // SCENARIO: Published and fully synced
+      actions.push({
+        label: "Unpublish Entry",
+        icon: EyeOff,
+        onClick: () => handleUnpublish(item._id),
+        variant: "danger",
+      });
+    }
+
+    return actions;
+  };
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
 
@@ -116,6 +153,38 @@ export function ProduceList() {
     setIsDeleting(false);
   };
 
+  // Inside ProduceList component
+  const handlePublish = async (produceId: string) => {
+    const loadingToast = toast.loading("Syncing with Sepolia Blockchain...");
+
+    try {
+      // 1. Call your server action
+      const result = await publishProduceToBlockchain(produceId);
+
+      if (result.success) {
+        toast.success("Successfully notarized on blockchain!", {
+          id: loadingToast,
+        });
+        loadData(); // Refresh the list to show the new "Verified" status
+      } else {
+        toast.error(`Blockchain Error: ${result.error}`, { id: loadingToast });
+      }
+    } catch (error) {
+      toast.error("An unexpected error occurred", { id: loadingToast });
+    }
+  };
+
+  const handleUnpublish = async (id: string) => {
+    const loading = toast.loading("Removing from marketplace...");
+    const res = await unpublishProduce(id);
+
+    if (res.success) {
+      toast.success("Item is now private", { id: loading });
+      loadData();
+    } else {
+      toast.error("Failed to unpublish", { id: loading });
+    }
+  };
   useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery]);
@@ -129,9 +198,40 @@ export function ProduceList() {
     );
   }
 
+  // Inside ProduceList component, before the return
+  const outOfSyncCount = produce.filter((item) => {
+    const { isOutOfSync } = getProduceSyncStatus(item);
+    return isOutOfSync; // Only count items that are published but modified
+  }).length;
   return (
     <div className="space-y-6">
       {/* --- SHARED TOP BAR --- */}
+
+      {/* --- REAL-TIME SYNC NOTIFICATION --- */}
+      {outOfSyncCount > 0 && (
+        <div className="bg-amber-50 border-l-4 border-amber-500 p-4 mb-6 rounded-r-xl shadow-sm animate-in slide-in-from-top duration-500">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="bg-amber-100 p-2 rounded-full">
+                <Globe className="w-4 h-4 text-amber-600 animate-pulse" />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-amber-900">
+                  {outOfSyncCount}{" "}
+                  {outOfSyncCount === 1 ? "item needs" : "items need"}{" "}
+                  re-verification
+                </p>
+                <p className="text-xs text-amber-700">
+                  You've made changes that aren't synced with the blockchain
+                  marketplace yet. <br />
+                  Click on the "Sync Changes" action in the produce list of the
+                  item to update
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       <header className="produce-header">
         <div className="flex items-center gap-3 flex-1 min-w-60">
           <div className="relative flex-1">
@@ -235,39 +335,72 @@ export function ProduceList() {
   );
 }
 
-/* --- HELPER COMPONENTS (To keep logic dry and clean) --- */
-const StatusRing = ({ status, image }: { status: string; image: string }) => (
-  <div className="relative w-12 h-12">
-    <img
-      src={image}
-      className={`w-12 h-12 rounded-lg object-cover border-2 transition-all ${
-        status === "published"
-          ? "border-emerald-500 shadow-sm"
-          : status === "processing"
-            ? "border-blue-500 animate-pulse"
-            : "border-slate-200 dark:border-slate-700 shadow-inner"
-      }`}
-      alt="img"
-    />
-    {status !== "none" && (
-      <span
-        className={`absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full border-2 border-white dark:border-slate-800 transition-colors ${
+const StatusRing = ({ produce, image }: { produce: any; image: string }) => {
+  // 1. Comparison Logic: Does the current state match the last notarized promise?
+  // const outOfSync = getProduceSyncStatus(produce).isOutOfSync;
+  const { isOutOfSync } = getProduceSyncStatus(produce);
+
+  // 2. State Management: Determine which color "Mode" to show
+  let status = "none";
+
+  if (produce.blockchainStatus === "processing") {
+    status = "processing"; // Sepolia transaction is in flight
+  } else if (produce.isPublished && isOutOfSync) {
+    status = "sync"; // Data mismatch between DB and Ledger
+  } else if (produce.isPublished) {
+    status = "published"; // Perfectly verified
+  }
+
+  return (
+    <div className="relative w-12 h-12">
+      {/* Produce Image with Dynamic Border */}
+      <img
+        src={image}
+        className={`w-12 h-12 rounded-lg object-cover border-2 transition-all ${
           status === "published"
-            ? "bg-emerald-500"
+            ? "border-emerald-500 shadow-sm shadow-emerald-100"
             : status === "processing"
-              ? "bg-blue-500"
-              : "bg-slate-300 dark:bg-slate-600" // New Gray dot for "none"
+              ? "border-blue-500 animate-pulse"
+              : status === "sync"
+                ? "border-amber-500 shadow-sm shadow-amber-100"
+                : "border-slate-400 dark:border-slate-700 shadow-inner"
         }`}
+        alt={produce.name}
       />
-    )}
-  </div>
-);
+
+      {/* Notification Badge Dot */}
+      {status !== "none" && (
+        <span
+          className={`absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full border-2 border-white dark:border-slate-800 transition-colors duration-300 ${
+            status === "published"
+              ? "bg-emerald-500"
+              : status === "processing"
+                ? "bg-blue-500"
+                : "bg-amber-500"
+          }`}
+        />
+      )}
+    </div>
+  );
+};
 
 function ProduceRow({ item, actions, activeMenu, setActiveMenu }: any) {
+  // 1. Check sync status once at the top
+  const { isOutOfSync } = getProduceSyncStatus(item);
+
+  // 2. Decide what color the dropdown header should be
+  // We use "sync" if it's out of sync, otherwise use the database status
+  const dropdownStatus =
+    item.blockchainStatus === "processing"
+      ? "processing"
+      : isOutOfSync
+        ? "sync"
+        : item.blockchainStatus;
+
   return (
     <tr className="inventory-row">
       <td className="inventory-td">
-        <StatusRing status={item.status} image={item.image} />
+        <StatusRing produce={item} image={item.image} />
       </td>
       <td className="inventory-td font-bold">{item.name}</td>
       <td className="inventory-td">
@@ -275,7 +408,6 @@ function ProduceRow({ item, actions, activeMenu, setActiveMenu }: any) {
           {item.category}
         </span>
       </td>
-      {/* --- UPDATED QUANTITY COLUMN --- */}
       <td className="inventory-td">
         {item.quantity <= 0 ? (
           <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black bg-red-100 text-red-600 uppercase tracking-widest animate-pulse">
@@ -296,11 +428,7 @@ function ProduceRow({ item, actions, activeMenu, setActiveMenu }: any) {
       </td>
       <td className="inventory-td text-[11px] text-slate-500">
         {item.updatedAt
-          ? new Date(item.updatedAt).toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
-              year: "numeric",
-            })
+          ? new Date(item.updatedAt).toLocaleDateString()
           : "No Date"}
       </td>
       <td className="inventory-td relative text-center">
@@ -314,7 +442,7 @@ function ProduceRow({ item, actions, activeMenu, setActiveMenu }: any) {
         </button>
         {activeMenu === item._id && (
           <ActionDropdown
-            status={item.blockchainStatus}
+            status={dropdownStatus} // <-- Now passes "sync" if needed!
             actions={actions}
             onClose={() => setActiveMenu(null)}
           />
@@ -325,23 +453,25 @@ function ProduceRow({ item, actions, activeMenu, setActiveMenu }: any) {
 }
 
 function ProduceCard({ item, actions, activeMenu, setActiveMenu }: any) {
+  const { isOutOfSync } = getProduceSyncStatus(item);
+
+  const dropdownStatus =
+    item.blockchainStatus === "processing"
+      ? "processing"
+      : isOutOfSync
+        ? "sync"
+        : item.blockchainStatus;
+
   return (
     <div className="mobile-inventory-card relative overflow-visible">
       <div className="flex items-center gap-4 mb-4">
-        <StatusRing status={item.status} image={item.image} />
+        <StatusRing produce={item} image={item.image} />
         <div className="flex-1">
           <h4 className="font-bold text-slate-900 dark:text-white leading-tight">
             {item.name}
           </h4>
           <p className="text-[11px] text-slate-500">
-            {item.category} •{" "}
-            {item.updatedAt
-              ? new Date(item.updatedAt).toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                  year: "numeric",
-                })
-              : "No Date"}
+            {item.category} • {item.updatedAt ? "Date" : "No Date"}
           </p>
         </div>
         <button
@@ -378,7 +508,7 @@ function ProduceCard({ item, actions, activeMenu, setActiveMenu }: any) {
       </div>
       {activeMenu === item._id && (
         <ActionDropdown
-          status={item.blockchainStatus}
+          status={dropdownStatus} // <-- Correct sync status for mobile!
           actions={actions}
           isMobile
           onClose={() => setActiveMenu(null)}
