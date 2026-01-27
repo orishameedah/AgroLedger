@@ -381,7 +381,7 @@ export function AddSaleModal({ isOpen, onClose, editingSale }: any) {
               </div>
 
               {/* SUMMARY & ACTIONS */}
-              <div className="sticky bottom-0 bg-slate-900 p-8 rounded-4xl text-white flex justify-between items-center shadow-2xl">
+              <div className="sticky bottom-0 bg-slate-900  p-8 rounded-4xl text-white flex flex-col md:flex-row md:justify-between md:items-center shadow-2xl">
                 <div>
                   <p className="text-[10px] opacity-50 font-bold uppercase tracking-widest">
                     Total Qty Sold

@@ -156,7 +156,7 @@ export const HomeDashboard = () => {
         {/* Header code stays same */}
         <div className="p-6 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
           <h3 className="font-bold text-lg text-slate-900 dark:text-white">
-            Recent Farm Produce Activities
+            RecentActivities
           </h3>
           {/* <button className="text-emerald-600 text-sm font-bold flex items-center gap-1 hover:underline">
             <Link href="/produce">
