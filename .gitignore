@@ -17,6 +17,8 @@
 /.next/
 /out/
 
+blockchain/ignition/deployments/
+
 # production
 /build
 
