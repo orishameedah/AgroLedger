@@ -75,12 +75,6 @@ export async function deleteProduce(id: string) {
       return { success: false, error: "Item not found in database." };
     }
 
-    /* FUTURE BLOCKCHAIN LOGIC:
-      if (deletedItem.isPublished) {
-         await revokeBlockchainRecord(deletedItem.blockchainId);
-      }
-    */
-
     revalidatePath("/farmer-dashboard");
     return { success: true };
   } catch (error) {
@@ -107,10 +101,9 @@ export async function getDashboardStats(userId: string) {
           totalValue: { $sum: "$totalPrice" },
           // Simple sum of your quantity field
           totalItems: { $sum: "$quantity" },
-          // Count how many have been published to blockchain
           activeListings: {
             $sum: {
-              $cond: [{ $eq: ["$blockchainStatus", "isPublished"] }, 1, 0],
+              $cond: [{ $eq: ["$isPublished", true] }, 1, 0],
             },
           },
         },
@@ -133,7 +126,7 @@ export async function publishProduceToBlockchain(produceId: string) {
     // 1. SET UI TO PROCESSING
     produce.blockchainStatus = "processing";
     await produce.save();
-    revalidatePath("/dashboard/produce");
+    revalidatePath("/produce");
 
     // 2. BLOCKCHAIN NOTARIZATION
     const contract = getAgroledgerContract();
@@ -161,7 +154,7 @@ export async function publishProduceToBlockchain(produceId: string) {
     };
 
     await produce.save();
-    revalidatePath("/dashboard/produce");
+    revalidatePath("/produce");
 
     return { success: true, hash: receipt.hash };
   } catch (error: any) {

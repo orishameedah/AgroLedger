@@ -174,7 +174,7 @@ export function AddProduceModal({
                 />
 
                 {/* Total Display */}
-                <div className="flex items-center justify-between p-6 bg-emerald-50 dark:bg-emerald-900/20 rounded-3xl border border-emerald-100 dark:border-emerald-900/30">
+                <div className="items-center flex flex-col md:flex-row justify-between p-6 bg-emerald-50 dark:bg-emerald-900/20 rounded-3xl border border-emerald-100 dark:border-emerald-900/30">
                   <span className="font-bold text-emerald-800 dark:text-emerald-300">
                     Total Valuation:
                   </span>
