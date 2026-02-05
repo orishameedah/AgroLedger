@@ -21,7 +21,7 @@ const navItems = [
   { name: "Home", href: "/farmer-dashboard", icon: Home },
   { name: "Farm Produce Record", href: "/produce", icon: FileText },
   { name: "Sales Records", href: "/sales", icon: ShoppingCart },
-  { name: "Settings", href: "/settings", icon: Settings },
+  { name: "Settings", href: "/settings-farmer", icon: Settings },
 ];
 
 // Note: 'user' prop comes from the session in your layout.tsx
