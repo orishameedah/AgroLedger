@@ -17,3 +17,13 @@ export function getProduceSyncStatus(produce: any) {
     status: isOutOfSync ? "sync_required" : "published",
   };
 }
+
+export const formatTime = (t?: string) => {
+  if (!t) return "";
+  const [h, m = "00"] = t.split(":");
+  let hour = parseInt(h, 10);
+  const minute = m.slice(0, 2);
+  const suffix = hour >= 12 ? "PM" : "AM";
+  hour = hour % 12 || 12;
+  return `${hour}:${minute} ${suffix}`;
+};

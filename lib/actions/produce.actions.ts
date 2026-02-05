@@ -37,6 +37,7 @@ export async function saveProduce(data: any, userId: string) {
 
     // Refresh the dashboard data
     revalidatePath("/farmer-dashboard");
+    revalidatePath("/marketplace");
     return { success: true };
   } catch (error) {
     console.error("Database Error:", error);
@@ -76,6 +77,7 @@ export async function deleteProduce(id: string) {
     }
 
     revalidatePath("/farmer-dashboard");
+    revalidatePath("/marketplace");
     return { success: true };
   } catch (error) {
     console.error("Delete Error:", error);
@@ -155,6 +157,7 @@ export async function publishProduceToBlockchain(produceId: string) {
 
     await produce.save();
     revalidatePath("/produce");
+    revalidatePath("/marketplace");
 
     return { success: true, hash: receipt.hash };
   } catch (error: any) {
@@ -173,7 +176,7 @@ export async function unpublishProduce(produceId: string) {
   try {
     await dbConnect();
 
-    const result = await Produce.findByIdAndUpdate(
+    await Produce.findByIdAndUpdate(
       produceId,
       {
         isPublished: false,
@@ -192,49 +195,66 @@ export async function unpublishProduce(produceId: string) {
   }
 }
 
-// lib/actions/produce.actions.ts
-// lib/actions/produce.actions.ts
-
-export async function fetchAllBlockchainData(idList: string[]) {
+export async function getAllMarketplaceProduce() {
   try {
-    const contract = getAgroledgerContract();
+    await dbConnect();
 
-    // We loop through the IDs and call getListing for each one
-    const blockchainRecords = await Promise.all(
-      idList.map(async (id) => {
-        // CALLING YOUR SMART CONTRACT FUNCTION HERE
-        const data = await contract.getListing(id);
+    // We only fetch items where isPublished is true
+    // We sort by newest first
+    const produce = await Produce.find({ isPublished: true })
+      .sort({ updatedAt: -1 })
+      .lean();
 
-        // If syncedBy is the "Zero Address", the item hasn't been notarized yet
-        const isNotarized =
-          data.syncedBy !== "0x0000000000000000000000000000000000000000";
-
-        return {
-          id,
-          price: Number(data.price),
-          quantity: Number(data.quantity),
-          syncedBy: data.syncedBy,
-          // Converting Solidity timestamp to JS Date
-          timestamp: data.timestamp ? Number(data.timestamp) * 1000 : null,
-          isNotarized,
-        };
-      }),
-    );
-
-    return { success: true, records: blockchainRecords };
+    return JSON.parse(JSON.stringify(produce));
   } catch (error) {
-    console.error("Ledger Read Error:", error);
-    return { success: false, error: "Failed to read the smart contract." };
+    console.error("Error fetching marketplace produce:", error);
+    return [];
   }
 }
 
-export async function getAllProduceIds() {
+export async function getProduceById(id: string) {
   try {
     await dbConnect();
-    // We only select the _id field to keep it fast and avoid CastErrors
-    const produce = await Produce.find({}, { _id: 1 });
-    return { success: true, ids: produce.map((p) => p._id.toString()) };
-  } catch (e) {
-    return { success: false, ids: [] };
+    const produce = await Produce.findById(id).lean();
+    return produce ? JSON.parse(JSON.stringify(produce)) : null;
+  } catch (error) {
+    console.error("Error fetching produce by ID:", error);
+    return null;
+  }
+}
+
+// lib/actions/produce.actions.ts
+
+export async function getRelatedProduce(
+  farmerId: string,
+  category: string,
+  currentProduceId: string,
+) {
+  try {
+    await dbConnect();
+
+    // 1. Try to find other items from the SAME FARMER first
+    let related = await Produce.find({
+      userId: farmerId,
+      _id: { $ne: currentProduceId },
+      isPublished: true,
+    })
+      .limit(4)
+      .lean();
+
+    // 2. FALLBACK: If the farmer has nothing else, find items in the SAME CATEGORY
+    if (related.length === 0) {
+      related = await Produce.find({
+        category: category,
+        _id: { $ne: currentProduceId },
+        isPublished: true,
+      })
+        .limit(4)
+        .lean();
+    }
+
+    return JSON.parse(JSON.stringify(related));
+  } catch (error) {
+    return [];
   }
 }
