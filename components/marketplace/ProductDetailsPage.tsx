@@ -238,7 +238,7 @@ export default function ProductDetailsClient({ produce, farmer }: any) {
               </button>
               <button
                 onClick={handleWhatsApp}
-                className="w-full py-5 bg-[#25D366] cursor-pointer text-white rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:shadow-xl transition-all active:scale-95"
+                className="w-full py-5 bg-[#25D366] flex md:flex-row flex-col cursor-pointer text-white rounded-2xl font-black uppercase tracking-widest text-xs  items-center justify-center gap-3 hover:shadow-xl transition-all active:scale-95"
               >
                 <MessageSquare size={18} /> WhatsApp Chat{" "}
                 <span>(+{formattedNumber})</span>
