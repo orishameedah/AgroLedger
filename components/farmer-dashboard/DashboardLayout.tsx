@@ -16,6 +16,7 @@ import { signOut } from "next-auth/react";
 import { ThemeProvider } from "next-themes";
 import { ThemeToggleButton } from "../ui/ThemeTogglebtn";
 import { ProfileDropdown } from "../ui/ProfileDropDown";
+import LanguageSelector from "../ui/LanguageSelector";
 
 const navItems = [
   { name: "Home", href: "/farmer-dashboard", icon: Home },
@@ -118,6 +119,8 @@ export function DashboardLayout({
             </div>
 
             <div className="flex items-center gap-4">
+              {/* --- LANGUAGE SELECTOR --- */}
+              <LanguageSelector />
               {/* Theme Toggle */}
               <ThemeToggleButton />
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { Tag, Weight, Banknote, Ruler } from "lucide-react";
-import { PRODUCE_CATEGORIES, UNITS_BY_CATEGORY } from "@/lib/constants";
+import { UNITS_BY_CATEGORY } from "@/lib/constants";
 
 interface ProduceFormFieldsProps {
   formData: any;

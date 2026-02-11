@@ -3,7 +3,6 @@
 import {
   Plus,
   ShoppingBag,
-  ArrowRight,
   Package,
   TrendingUp,
   LayoutGrid,
@@ -39,10 +38,6 @@ export const HomeDashboard = () => {
           getRecentActivities(session.user.id),
           getTotalSales(session.user.id),
         ]);
-
-        // setStats(statsData);
-        // setActivities(activityData);
-        // setLoading(false);
 
         setStats({
           ...statsData,
@@ -158,11 +153,6 @@ export const HomeDashboard = () => {
           <h3 className="font-bold text-lg text-slate-900 dark:text-white">
             RecentActivities
           </h3>
-          {/* <button className="text-emerald-600 text-sm font-bold flex items-center gap-1 hover:underline">
-            <Link href="/produce">
-              View All <ArrowRight className="w-4 h-4" />
-            </Link>
-          </button> */}
         </div>
 
         {/* Desktop view */}
