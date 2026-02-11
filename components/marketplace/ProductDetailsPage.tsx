@@ -109,7 +109,8 @@ export default function ProductDetailsClient({ produce, farmer }: any) {
                     Price per {produce.unit}
                   </p>
                   <p className="text-2xl md:text-3xl font-black text-emerald-700 dark:text-emerald-400">
-                    ₦{produce.pricePerUnit.toLocaleString()}
+                    {/* ₦{produce.pricePerUnit.toLocaleString()} */}₦
+                    {produce.lastPublishedSnapshot?.pricePerUnit.toLocaleString()}
                   </p>
                 </div>
               </div>
@@ -121,7 +122,7 @@ export default function ProductDetailsClient({ produce, farmer }: any) {
                     Available Stock
                   </p>
                   <p className="text-lg font-bold text-slate-800 dark:text-white">
-                    {produce.quantity} {produce.unit}
+                    {produce.lastPublishedSnapshot?.quantity} {produce.unit}
                   </p>
                 </div>
               </div>

@@ -58,7 +58,7 @@ export async function updateFarmerSettings(userId: string, data: any) {
         locations: data.locations,
         availability: data.availability,
       },
-      { upsert: true } // Create if missing
+      { upsert: true }, // Create if missing
     );
 
     revalidatePath("/farmer-dashboard/settings");

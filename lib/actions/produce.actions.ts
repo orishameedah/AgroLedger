@@ -49,10 +49,9 @@ export async function fetchAllProduce(userId: string) {
   try {
     await dbConnect();
 
-    // Find non-archived items for this specific farmer
     const produceList = await Produce.find({
       userId,
-      isArchived: { $ne: true },
+      // isArchived: { $ne: true },
     }).sort({ updatedAt: -1 }); // Newest first
 
     return {
@@ -68,8 +67,6 @@ export async function fetchAllProduce(userId: string) {
 export async function deleteProduce(id: string) {
   try {
     await dbConnect();
-
-    // 1. Physical Delete from MongoDB
     const deletedItem = await Produce.findByIdAndDelete(id);
 
     if (!deletedItem) {
@@ -163,7 +160,6 @@ export async function publishProduceToBlockchain(produceId: string) {
   } catch (error: any) {
     console.error("Blockchain publish failed:", error);
 
-    // ROLLBACK: Reset UI so the farmer can try again
     await Produce.findByIdAndUpdate(produceId, { blockchainStatus: "none" });
     revalidatePath("/dashboard/produce");
 
@@ -171,7 +167,6 @@ export async function publishProduceToBlockchain(produceId: string) {
   }
 }
 
-// lib/actions/produce.actions.ts
 export async function unpublishProduce(produceId: string) {
   try {
     await dbConnect();
@@ -181,7 +176,6 @@ export async function unpublishProduce(produceId: string) {
       {
         isPublished: false,
         blockchainStatus: "none", // Reset status so they can publish again later
-        // We keep the lastSyncedAt and transactionHash for history/records
       },
       { new: true },
     );
@@ -198,9 +192,6 @@ export async function unpublishProduce(produceId: string) {
 export async function getAllMarketplaceProduce() {
   try {
     await dbConnect();
-
-    // We only fetch items where isPublished is true
-    // We sort by newest first
     const produce = await Produce.find({ isPublished: true })
       .sort({ updatedAt: -1 })
       .lean();

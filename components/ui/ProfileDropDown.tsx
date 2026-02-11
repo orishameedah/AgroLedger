@@ -2,14 +2,26 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { User, LogOut, ChevronDown } from "lucide-react";
+import {
+  User,
+  LogOut,
+  ChevronDown,
+  LayoutDashboard,
+  Settings,
+} from "lucide-react";
 import { signOut } from "next-auth/react";
 import { useSession } from "next-auth/react";
+import { usePathname } from "next/navigation";
 
 export function ProfileDropdown({ user }: { user: any }) {
   const [profileOpen, setProfileOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { data: session } = useSession();
+  const pathname = usePathname(); // Detects current URL
+
+  const isFarmer = session?.user?.role === "farmer";
+  // Logic: Are we currently inside any dashboard route?
+  const isInDashboard = pathname.includes("/farmer-dashboard");
 
   const handleLogout = () => {
     const role = user?.role;
@@ -81,8 +93,20 @@ export function ProfileDropdown({ user }: { user: any }) {
             </p>
           </div>
 
+          {/* DYNAMIC DASHBOARD LINK: Only show to Farmers NOT in the dashboard */}
+          {/* {isFarmer && !isInDashboard && (
+            <Link
+              href="/farmer-dashboard"
+              onClick={() => setProfileOpen(false)}
+              className="flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors"
+            >
+              <LayoutDashboard className="w-4 h-4" />
+              Go to Dashboard
+            </Link>
+          )} */}
+
           {/* DYNAMIC SETTINGS LINK */}
-          <Link
+          {/* <Link
             href={
               session?.user?.role === "farmer"
                 ? "/settings-farmer"
@@ -92,8 +116,33 @@ export function ProfileDropdown({ user }: { user: any }) {
           >
             <User className="w-4 h-4" />
             Profile Settings
-          </Link>
+          </Link> */}
 
+          {/* DYNAMIC SETTINGS LINK */}
+          {/* FARMER ONLY LINKS */}
+          {isFarmer && (
+            <>
+              {!isInDashboard && (
+                <Link
+                  href="/farmer-dashboard"
+                  onClick={() => setProfileOpen(false)}
+                  className="flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors"
+                >
+                  <LayoutDashboard className="w-4 h-4" />
+                  Go to Dashboard
+                </Link>
+              )}
+              <Link
+                href="/farmer-dashboard/settings"
+                onClick={() => setProfileOpen(false)}
+                className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+              >
+                <Settings className="w-4 h-4" />
+                Profile Settings
+              </Link>
+            </>
+          )}
+          <div className="h-px bg-slate-100 dark:bg-slate-700 my-1 mx-2" />
           <button
             onClick={handleLogout}
             className="flex w-full cursor-pointer items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
