@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useRef } from "react";
-import { Search, Tag, DollarSign, ShieldCheck, Camera } from "lucide-react";
+import { Search, Tag, DollarSign, Clock, Camera } from "lucide-react";
 import { PRODUCE_CATEGORIES } from "@/lib/constants";
-import toast from "react-hot-toast";
+import { useState, useEffect } from "react";
 
 type Props = {
   searchQuery: string;

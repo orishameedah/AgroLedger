@@ -8,6 +8,7 @@ import {
   ChevronDown,
   LayoutDashboard,
   Settings,
+  Store,
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { useSession } from "next-auth/react";
@@ -20,8 +21,9 @@ export function ProfileDropdown({ user }: { user: any }) {
   const pathname = usePathname(); // Detects current URL
 
   const isFarmer = session?.user?.role === "farmer";
-  // Logic: Are we currently inside any dashboard route?
-  const isInDashboard = pathname.includes("/farmer-dashboard");
+
+  // Detection Logic
+  const isInMarketplace = pathname.includes("/marketplace");
 
   const handleLogout = () => {
     const role = user?.role;
@@ -93,36 +95,11 @@ export function ProfileDropdown({ user }: { user: any }) {
             </p>
           </div>
 
-          {/* DYNAMIC DASHBOARD LINK: Only show to Farmers NOT in the dashboard */}
-          {/* {isFarmer && !isInDashboard && (
-            <Link
-              href="/farmer-dashboard"
-              onClick={() => setProfileOpen(false)}
-              className="flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors"
-            >
-              <LayoutDashboard className="w-4 h-4" />
-              Go to Dashboard
-            </Link>
-          )} */}
-
-          {/* DYNAMIC SETTINGS LINK */}
-          {/* <Link
-            href={
-              session?.user?.role === "farmer"
-                ? "/settings-farmer"
-                : "/settings-buyer"
-            }
-            className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 hover:text-emerald-700 transition-colors"
-          >
-            <User className="w-4 h-4" />
-            Profile Settings
-          </Link> */}
-
-          {/* DYNAMIC SETTINGS LINK */}
-          {/* FARMER ONLY LINKS */}
+          {/* FARMER ONLY DYNAMIC LINKS */}
           {isFarmer && (
             <>
-              {!isInDashboard && (
+              {/* 1. If in Marketplace, show "Go to Dashboard" */}
+              {isInMarketplace && (
                 <Link
                   href="/farmer-dashboard"
                   onClick={() => setProfileOpen(false)}
@@ -132,8 +109,9 @@ export function ProfileDropdown({ user }: { user: any }) {
                   Go to Dashboard
                 </Link>
               )}
+
               <Link
-                href="/farmer-dashboard/settings"
+                href="/settings-farmer"
                 onClick={() => setProfileOpen(false)}
                 className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
               >
