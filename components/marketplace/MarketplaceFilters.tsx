@@ -1,8 +1,9 @@
 "use client";
 
-import React from "react";
-import { Search, Tag, DollarSign, ShieldCheck } from "lucide-react";
+import React, { useRef } from "react";
+import { Search, Tag, DollarSign, ShieldCheck, Camera } from "lucide-react";
 import { PRODUCE_CATEGORIES } from "@/lib/constants";
+import toast from "react-hot-toast";
 
 type Props = {
   searchQuery: string;
@@ -16,6 +17,7 @@ type Props = {
   maxPrice: string;
   setMaxPrice: (v: string) => void;
   onClearAll?: () => void;
+  setIsAiLoading: (v: boolean) => void;
 };
 
 export function MarketplaceFilters({
@@ -23,15 +25,44 @@ export function MarketplaceFilters({
   setSearchQuery,
   selectedCategory,
   setSelectedCategory,
-  syncFilter,
-  setSyncFilter,
+  // syncFilter,
+  // setSyncFilter,
   minPrice,
   setMinPrice,
   maxPrice,
   setMaxPrice,
   onClearAll,
+  setIsAiLoading,
 }: Props) {
   const handleManualSearch = (val: string) => setSearchQuery(val);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsAiLoading(true);
+
+    // We'll create this API call next
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await fetch("/api/visual-search", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (data.result) {
+        setSearchQuery(data.result.trim()); // Automatically puts "Yam" or "Cow" in the search box
+      }
+    } catch (err) {
+      console.error("Visual Search Error:", err);
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
 
   return (
     <section className="bg-white dark:bg-slate-900 p-6 rounded-4xl border border-slate-200 dark:border-slate-800 shadow-sm">
@@ -76,20 +107,22 @@ export function MarketplaceFilters({
 
           <div className="space-y-2">
             <label className="text-[10px] font-black uppercase text-slate-400 ml-1">
-              Status
+              Visual Search
             </label>
-            <div className="relative">
-              <ShieldCheck className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
-              <select
-                className="w-full pl-9 pr-8 py-3 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl text-xs appearance-none cursor-pointer outline-none"
-                value={syncFilter}
-                onChange={(e) => setSyncFilter(e.target.value)}
-              >
-                <option value="all">All</option>
-                <option value="verified">Verified</option>
-                <option value="pending">Pending</option>
-              </select>
-            </div>
+            <input
+              type="file"
+              ref={fileInputRef}
+              hidden
+              accept="image/*"
+              onChange={handleImageChange}
+            />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="w-full flex items-center justify-center gap-2 py-3 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 rounded-2xl text-xs font-bold hover:bg-emerald-100 transition-all border border-dashed border-emerald-200"
+            >
+              <Camera size={16} />
+              <span>Snap & Search</span>
+            </button>
           </div>
         </div>
 
@@ -127,7 +160,7 @@ export function MarketplaceFilters({
             onClick={() => {
               setSearchQuery("");
               setSelectedCategory("all");
-              setSyncFilter("all");
+              // setSyncFilter("all");
               setMinPrice("");
               setMaxPrice("");
               onClearAll?.();
