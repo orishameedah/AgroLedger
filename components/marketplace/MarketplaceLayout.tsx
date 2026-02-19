@@ -5,7 +5,8 @@ import { ThemeToggleButton } from "../ui/ThemeTogglebtn";
 import { ProfileDropdown } from "../ui/ProfileDropDown";
 import { ThemeProvider } from "next-themes";
 import Link from "next/link";
-import MarketChatbot from "./MarketChatbot";
+// import MarketChatbot from "./MarketChatbot";
+// import Chatbot from "../ui/Chatbot";
 import GTranslate from "../ui/LanguageSelector";
 
 export function MarketplaceLayout({
@@ -41,7 +42,8 @@ export function MarketplaceLayout({
         <main className="flex-1">
           <div className="max-w-7xl mx-auto p-3 md:p-8">{children} </div>
         </main>
-        <MarketChatbot />
+        {/* <MarketChatbot /> */}
+        {/* <Chatbot /> */}
         {/* Global Language Selector */}
         <GTranslate />
       </div>

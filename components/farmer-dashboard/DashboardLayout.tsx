@@ -16,7 +16,7 @@ import { signOut } from "next-auth/react";
 import { ThemeProvider } from "next-themes";
 import { ThemeToggleButton } from "../ui/ThemeTogglebtn";
 import { ProfileDropdown } from "../ui/ProfileDropDown";
-// import LanguageSelector from "../ui/LanguageSelector";
+import Chatbot from "../ui/Chatbot";
 
 const navItems = [
   { name: "Home", href: "/farmer-dashboard", icon: Home },
@@ -136,6 +136,9 @@ export function DashboardLayout({
             </div>
           </main>
         </div>
+
+        {/* Chatbot */}
+        <Chatbot contextType="dashboard" />
       </ThemeProvider>
     </div>
   );
