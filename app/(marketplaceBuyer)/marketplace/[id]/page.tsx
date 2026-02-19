@@ -3,6 +3,7 @@ import { getFarmerSettings } from "@/lib/actions/user.actions";
 import ProductDetailsClient from "@/components/marketplace/ProductDetailsPage";
 import { notFound } from "next/navigation";
 import RelatedProduce from "@/components/marketplace/RelatedProduce";
+import Chatbot from "@/components/ui/Chatbot";
 
 export default async function ProductPage({
   params,
@@ -22,6 +23,18 @@ export default async function ProductPage({
     throw new Error("NETWORK_FAILURE");
   }
   const farmer = await getFarmerSettings(produce.userId);
+  const combinedData = {
+    produceName: produce.name,
+    producePrice: produce.lastPublishedSnapshot?.pricePerUnit,
+    produceQuantity: produce.lastPublishedSnapshot?.quantity,
+    unit: produce.unit,
+    farmerName: farmer.fullName,
+    farmName: farmer.farmName,
+    phoneNumber: farmer.phone,
+    location: farmer.locations,
+  };
+
+  const serializedData = JSON.parse(JSON.stringify(combinedData));
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-5">
@@ -32,6 +45,7 @@ export default async function ProductPage({
         currentProduceId={id}
         farmName={farmer.farmName}
       />
+      <Chatbot contextType="product" contextData={serializedData} />
     </div>
   );
 }

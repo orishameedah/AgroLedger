@@ -19,7 +19,7 @@ export default function GTranslate(): React.JSX.Element {
     switcher_horizontal_position: "right",
     switcher_vertical_position: "bottom",
     flag_style: "2d",
-    flag_size: 16,
+    flag_size: 24,
     alt_flags: { en: "usa" },
   } as const;
 
