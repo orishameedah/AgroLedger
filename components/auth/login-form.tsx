@@ -50,36 +50,24 @@ export const LoginForm = ({ mainTitle, formTitle, role }: AuthFormProps) => {
       password: "",
     },
   });
-
-  // --- GOOGLE LOGIN LOGIC ---
   const handleGoogleLogin = async () => {
     setIsRedirecting(true);
-    // const callbackUrl = role === "farmer" ? "/farmer-setup" : "/marketplace";
-    // await signIn("google", { callbackUrl });
-
-    // We add the role to the URL so we can "catch" it later
-    const callbackUrl =
-      role === "farmer"
-        ? "/farmer-setup?role=farmer"
-        : "/marketplace?role=buyer";
-
+    // Create the "Sticky Note"
+    document.cookie = `agro_role=${role}; path=/; max-age=300`;
+    const callbackUrl = role === "farmer" ? "/farmer-setup" : "/marketplace";
     await signIn("google", { callbackUrl });
   };
-
   const onLogin = async (data: LoginInput) => {
-    // 1. Reset all errors immediately
     setFieldErrors({ identifier: "", password: "" });
     setError("");
 
     try {
-      // 2. Attempt Sign In
       const result = await signIn("credentials", {
         identifier: data.identifier,
         password: data.password,
         redirect: false,
       });
 
-      // 3. Handle Errors
       if (result?.error) {
         const errorMsg = result.error.toLowerCase();
 
@@ -102,17 +90,12 @@ export const LoginForm = ({ mainTitle, formTitle, role }: AuthFormProps) => {
         return;
       }
 
-      // 4. Success Path
       if (result?.ok) {
-        // Trigger the Universal Success Popup
         setShowSuccess(true);
 
-        // We wait for 2 seconds (2000ms) so the user can actually read the success message
         setTimeout(() => {
           setIsRedirecting(true); // Show the button loader/spinner
-
           const path = role === "farmer" ? "/farmer-setup" : "/marketplace";
-
           router.push(path);
           router.refresh();
         }, 2000);

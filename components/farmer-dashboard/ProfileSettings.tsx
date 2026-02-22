@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import {
   User,
   MapPin,
-  Calendar,
   Mail,
   Phone,
   Hash,
@@ -63,6 +62,9 @@ export function SettingsPage() {
     setIsSaving(false);
   };
 
+  // NEW: Detect Google Account based on your schema logic
+  const isGoogleAccount = formData.isGoogle;
+
   if (isLoading)
     return (
       <div className="h-[60vh] flex flex-col items-center justify-center gap-4 text-emerald-600 font-bold">
@@ -107,19 +109,37 @@ export function SettingsPage() {
             <User className="text-blue-600 w-5 h-5" />
           </div>
           <h3 className="font-bold">Personal Information</h3>
+          {/* INDICATOR: Show this only for Google Users */}
+          {isGoogleAccount && (
+            <span className="text-[10px] bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-black uppercase tracking-tighter">
+              Google Verified Account
+            </span>
+          )}
+        </div>
+
+        <div className="p-2">
+          {isGoogleAccount && isEditing && (
+            <div className=" p-4 bg-slate-50 border border-slate-100 rounded-2xl flex items-center gap-x-3">
+              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
+              <p className="text-[12px] text-slate-500 font-medium">
+                Note: Profile identity is managed via Google. Name and Username
+                cannot be modified.
+              </p>
+            </div>
+          )}
         </div>
         <div className="settings-card-content grid grid-cols-1 md:grid-cols-2 gap-6">
           <InputItem
             label="Full Name"
             value={formData.fullName}
-            disabled={!isEditing}
+            disabled={!isEditing || isGoogleAccount}
             icon={<User size={12} />}
             onChange={(v: string) => setFormData({ ...formData, fullName: v })}
           />
           <InputItem
             label="Username"
             value={formData.username}
-            disabled={!isEditing}
+            disabled={!isEditing || isGoogleAccount}
             icon={<Hash size={12} />}
             onChange={(v: string) => setFormData({ ...formData, username: v })}
           />
@@ -268,7 +288,7 @@ export function SettingsPage() {
                   onClick={() => {
                     const days = formData.availability.days.includes(day)
                       ? formData.availability.days.filter(
-                          (d: string) => d !== day
+                          (d: string) => d !== day,
                         )
                       : [...formData.availability.days, day];
                     setFormData({

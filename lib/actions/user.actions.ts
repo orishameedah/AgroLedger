@@ -12,13 +12,14 @@ export async function getFarmerSettings(userId: string) {
   try {
     await dbConnect();
 
-    const user = await User.findById(userId).lean();
+    const user = await User.findById(userId).select("+password").lean();
     const farm = await Farm.findOne({ userId }).lean();
 
     return {
       fullName: user?.name || "",
       username: user?.username || "",
       email: user?.email || "",
+      isGoogle: !user?.password,
       phone: farm?.phoneNumber || "",
       farmName: farm?.farmName || "",
       farmTypes: farm?.farmTypes || [],

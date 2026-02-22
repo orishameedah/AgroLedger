@@ -41,6 +41,12 @@ export function HeroSection() {
             >
               Get Started
             </button>
+            <button
+              className="hover:bg-green-800/10 cursor-pointer bg-green-700 text-white border-2 border-white font-bold py-4 px-10 rounded-full transition-all hover:scale-105 w-full sm:w-auto text-lg"
+              onClick={() => setIsModalOpen(true)}
+            >
+              Demo Video
+            </button>
           </div>
         </motion.div>
       </div>

@@ -23,6 +23,7 @@ export const SignUpForm = ({ mainTitle, formTitle, role }: AuthFormProps) => {
   const [showPassword, setShowPassword] = useState(false); // Initial state is hidden
   const [serverError, setServerError] = useState<string | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   const router = useRouter();
 
@@ -49,23 +50,22 @@ export const SignUpForm = ({ mainTitle, formTitle, role }: AuthFormProps) => {
       setTimeout(() => {
         router.push(role === "farmer" ? "/login/farmer" : "/login/buyer");
       }, 3000);
-      // router.push(role === "farmer" ? "/login/farmer" : "/login/buyer");
     } catch (error: any) {
       setServerError(
-        error.response?.data?.message || "An unexpected error occurred."
+        error.response?.data?.message || "An unexpected error occurred.",
       );
     }
   };
-
   const handleGoogleSignup = () => {
-    // Redirects to setup for farmers or marketplace for buyers after Google login
+    setIsRedirecting(true); // Now it has loading!
+    // Create the "Sticky Note"
+    document.cookie = `agro_role=${role}; path=/; max-age=300`;
     const callbackUrl = role === "farmer" ? "/farmer-setup" : "/marketplace";
     signIn("google", { callbackUrl });
   };
 
   // Dynamically set the signup link based on the role prop
   const loginPath = role === "farmer" ? "/login/farmer" : "/login/buyer";
-
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev); // Toggles true/false
   };
