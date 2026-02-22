@@ -65,8 +65,8 @@ export function MarketplaceFilters({
   };
 
   return (
-    <section className="bg-white dark:bg-slate-900 p-6 rounded-4xl border border-slate-200 dark:border-slate-800 shadow-sm">
-      <div className="flex flex-col lg:flex-row gap-6 items-end dark:text-white">
+    <section className="bg-white dark:bg-slate-900 md:p-6 p-4 rounded-4xl border border-slate-200 dark:border-slate-800 shadow-sm">
+      <div className="flex flex-col lg:flex-row md:gap-6 gap-3 items-end dark:text-white">
         <div className="w-full lg:w-64 space-y-2">
           <label className="text-[10px] font-black uppercase text-slate-400 dark:text-white tracking-widest ml-1">
             Search
@@ -155,7 +155,7 @@ export function MarketplaceFilters({
           </div>
         </div>
 
-        <div className="pb-3 w-full lg:w-auto">
+        <div className="lg:pb-3 pb-0 w-full lg:w-auto">
           <button
             onClick={() => {
               setSearchQuery("");

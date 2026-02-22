@@ -5,8 +5,6 @@ import { ThemeToggleButton } from "../ui/ThemeTogglebtn";
 import { ProfileDropdown } from "../ui/ProfileDropDown";
 import { ThemeProvider } from "next-themes";
 import Link from "next/link";
-// import MarketChatbot from "./MarketChatbot";
-// import Chatbot from "../ui/Chatbot";
 import GTranslate from "../ui/LanguageSelector";
 
 export function MarketplaceLayout({

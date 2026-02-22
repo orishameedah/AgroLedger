@@ -5,12 +5,18 @@ import GoogleProvider from "next-auth/providers/google";
 import bcrypt from "bcryptjs";
 import dbConnect from "@/lib/mongodb";
 import UserModel from "@/models/User"; // Renamed import to avoid collision
+import { cookies } from "next/headers";
 
 export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      authorization: {
+        params: {
+          prompt: "select_account", // This FORCES the pop-up to show all accounts
+        },
+      },
     }),
     CredentialsProvider({
       name: "Credentials",
@@ -32,7 +38,7 @@ export const authOptions: NextAuthOptions = {
 
         const isValid = await bcrypt.compare(
           credentials!.password,
-          user.password
+          user.password,
         );
         if (!isValid) throw new Error("Incorrect password");
 
@@ -48,22 +54,29 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async signIn({ user, account }) {
+    async signIn({ user, account, profile }) {
       if (account?.provider === "google") {
         try {
           await dbConnect();
           const userEmail = user.email?.toLowerCase();
           const existingUser = await UserModel.findOne({ email: userEmail });
 
+          // READ THE STICKY NOTE
+          const cookieStore = cookies();
+          const detectedRole =
+            (await cookieStore).get("agro_role")?.value || "buyer";
+
           if (!existingUser) {
             await UserModel.create({
               name: user.name || "Agroledger User",
               email: userEmail,
-              image: user.image || "",
+              // image: user.image || "",
+              image: user.image || (profile as any)?.picture || "",
               username:
                 (userEmail?.split("@")[0] || "user") +
                 Math.floor(1000 + Math.random() * 9000),
-              role: "buyer",
+              // role: "buyer",
+              role: detectedRole,
               isSetupComplete: false,
             });
           }
@@ -82,17 +95,30 @@ export const authOptions: NextAuthOptions = {
       user,
       trigger,
       session,
+      account,
     }: {
       token: JWT;
       user?: any;
       trigger?: string;
       session?: any;
+      account?: any;
     }) {
       if (user) {
         token.id = user.id;
         token.role = user.role;
         token.isSetupComplete = user.isSetupComplete;
         token.username = user.username;
+      }
+
+      if (!token.role && token.email) {
+        await dbConnect();
+        const dbUser = await UserModel.findOne({ email: token.email });
+        if (dbUser) {
+          token.id = dbUser._id.toString();
+          token.role = dbUser.role;
+          token.isSetupComplete = dbUser.isSetupComplete;
+          token.username = dbUser.username;
+        }
       }
 
       if (trigger === "update" && session?.user) {

@@ -2,7 +2,6 @@ import "../globals.css";
 import Header from "../../components/marketing/Header";
 import LightRays from "../../components/marketing/LightRays";
 import { Footer } from "@/components/marketing/Footer";
-import GTranslate from "@/components/ui/LanguageSelector";
 
 export default function MarketingLayout({
   children,
@@ -27,8 +26,6 @@ export default function MarketingLayout({
       </div>
       {children}
       <Footer />
-      {/* Global Language Selector */}
-      <GTranslate />
     </>
   );
 }
