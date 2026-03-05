@@ -2,8 +2,8 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
-import Img1 from "@/public/web-images/nigerian-farmer-using-smartphone-in-field.jpg";
-import Img2 from "@/public/web-images/buyer-marketplace-interface-agricultural-products.jpg";
+import Img1 from "@/public/web-images/dashboard.jpg";
+import Img2 from "@/public/web-images/marketplace.jpg";
 
 export function HowItWorksSection() {
   return (
@@ -49,13 +49,14 @@ export function HowItWorksSection() {
                 For Farmers
               </div>
               <h3 className="text-2xl md:text-3xl font-bold text-shadow-black text-foreground mb-2 text-balance">
-                Record Your Harvest Securely
+                Manage Your Dashboard
               </h3>
               <p className="text-muted-foreground leading-relaxed text-lg text-justify text-balance">
-                Every harvest you record gets a unique blockchain ID for
-                complete traceability. Your produce is verifiable from farm to
-                market, building trust with buyers and ensuring you receive fair
-                compensation for your hard work.
+                Farmers can add, edit, and manage their produce, sales, profile
+                within a secure dashboard. When ready, they can publish their
+                produce listings to the marketplace, which triggers a blockchain
+                transaction to create a verifiable record of the produce
+                details.
               </p>
             </motion.div>
           </div>
@@ -78,10 +79,10 @@ export function HowItWorksSection() {
                 Browse Verified Listings with Confidence
               </h3>
               <p className="text-muted-foreground leading-relaxed text-lg text-justify text-balance">
-                Purchase directly from farmers knowing the exact origin of every
-                product. Our blockchain verification ensures authenticity and
-                quality, while eliminating unnecessary intermediaries that
-                inflate costs.
+                Buyers can browse marketplace listings and verify the details of
+                each published produce item. Blockchain verification provides
+                confidence in authenticity while enabling direct engagement with
+                farmers.
               </p>
             </motion.div>
 

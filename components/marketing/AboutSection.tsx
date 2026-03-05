@@ -7,21 +7,21 @@ import { FeatureCard } from "./about-features";
 const features = [
   {
     icon: Blocks,
-    title: "Immutable Records",
+    title: "Blockchain-Backed Transparency",
     description:
-      "Every transaction is permanently recorded on the blockchain, ensuring complete transparency and trust in the supply chain.",
+      "When farmers publish produce to the marketplace, the transaction is securely recorded on the blockchain, ensuring transparency and preventing data manipulation.",
   },
   {
     icon: Handshake,
     title: "Direct Market Access",
     description:
-      "Connect farmers directly with buyers, removing middlemen and ensuring fair compensation for agricultural producers.",
+      "AgroLedger removes unnecessary intermediaries by allowing farmers to list produce directly and buyers can see clear pricing and source information",
   },
   {
     icon: Verified,
     title: "Verified Provenance",
     description:
-      "Every harvest carries a digital certificate of origin, allowing buyers to verify the quality and source of their food directly from the soil it was grown in.",
+      "Each published produce listing is assigned a unique digital identifier, enabling buyers to verify authenticity.",
   },
 ];
 

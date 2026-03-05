@@ -25,13 +25,14 @@ export function HeroSection() {
           className="max-w-4xl mx-auto"
         >
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
-            Securing Nigeria's Harvest through{" "}
-            <span className="text-green-400">Blockchain Transparency</span>
+            Connecting Farmers and Buyers through{" "}
+            <span className="text-green-400">Verified Digital Agriculture</span>
           </h1>
 
           <p className="text-gray-300 mb-10 max-w-2xl mx-auto">
-            AgroLedger connects farmers directly to buyers, eliminating
-            middlemen and ensuring fair prices with immutable records.
+            AgroLedger enables farmers to manage and publish their produce to a
+            transparent marketplace, where buyers can verify the authenticity of
+            produce list using blockchain-backed records.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -40,12 +41,6 @@ export function HeroSection() {
               onClick={() => setIsModalOpen(true)}
             >
               Get Started
-            </button>
-            <button
-              className="hover:bg-green-800/10 cursor-pointer bg-green-700 text-white border-2 border-white font-bold py-4 px-10 rounded-full transition-all hover:scale-105 w-full sm:w-auto text-lg"
-              onClick={() => setIsModalOpen(true)}
-            >
-              Demo Video
             </button>
           </div>
         </motion.div>

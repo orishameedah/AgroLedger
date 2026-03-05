@@ -43,6 +43,17 @@ export async function updateFarmerSettings(userId: string, data: any) {
   try {
     await dbConnect();
 
+    const user = await User.findById(userId).select("+password");
+
+    const isGoogle = !user?.password;
+
+    if (isGoogle) {
+      return {
+        success: false,
+        error: "Google accounts cannot edit fullname or username",
+      };
+    }
+
     // 1. Update User Profile (Basic Info)
     await User.findByIdAndUpdate(userId, {
       name: data.fullName,

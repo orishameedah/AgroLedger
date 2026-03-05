@@ -34,25 +34,24 @@ export function AboutSection2() {
           >
             {/* <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6 text-balance"> */}
             <h2 className="text-3xl md:text-5xl font-extrabold text-slate-900 mb-6">
-              Empowering Nigeria&apos;s Agricultural Future
+              Building Trust in Nigeria’s Agricultural Marketplace
             </h2>
             <div className="space-y-6 text-lg text-slate-700 leading-relaxed">
               <p>
-                Our mission is to empower smallholder farmers across
-                Nigeria&apos;s food basket regions by providing them with direct
-                access to markets and fair pricing through blockchain
-                technology.
+                AgroLedger is designed to support smallholder farmers by
+                providing a structured digital system for managing and
+                publishing agricultural produce to a verified online
+                marketplace.
               </p>
               <p>
-                By eliminating intermediaries and ensuring transparent,
-                immutable records of every transaction, we&apos;re creating a
-                more equitable agricultural ecosystem that benefits both farmers
-                and buyers.
+                Through role-based access and blockchain-backed verification,
+                the platform enhances transparency, reduces disputes, and
+                strengthens trust between farmers and buyers.
               </p>
               <p>
-                AgroLedger is more than a platform—it&apos;s a movement towards
-                transparency, fairness, and prosperity for Nigeria&apos;s
-                agricultural sector.
+                By combining digital record-keeping with semi-decentralized
+                verification, AgroLedger contributes to a more accountable and
+                efficient agricultural supply chain in Nigeria.
               </p>
             </div>
           </motion.div>
