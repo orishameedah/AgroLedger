@@ -38,42 +38,6 @@ export async function createSale(userId: string, data: any) {
   }
 }
 
-/**
- * THE EDIT ACTION: This allows adding more buyers
- */
-// export async function updateSale(saleId: string, newData: any) {
-//   try {
-//     await dbConnect();
-//     const oldSale = await Sale.findById(saleId);
-//     if (!oldSale) throw new Error("Not found");
-
-//     if (oldSale.produceId) {
-//       const produce = await Produce.findById(oldSale.produceId);
-//       if (produce) {
-//         // Step A: "Refund" the old total quantity back to stock
-//         const restoredQty = produce.quantity + oldSale.totalQuantitySold;
-//         // Step B: Subtract the NEW total (with the new buyers)
-//         const finalQty = Math.max(
-//           0,
-//           restoredQty - Number(newData.totalQuantitySold)
-//         );
-
-//         await Produce.findByIdAndUpdate(oldSale.produceId, {
-//           quantity: finalQty,
-//           totalPrice: finalQty * produce.pricePerUnit,
-//         });
-//       }
-//     }
-
-//     await Sale.findByIdAndUpdate(saleId, newData);
-//     revalidatePath("/sales");
-//     revalidatePath("/produce");
-//     return { success: true };
-//   } catch (error) {
-//     return { success: false };
-//   }
-// }
-
 export async function updateSale(saleId: string, newData: any) {
   try {
     await dbConnect();
@@ -150,8 +114,8 @@ export async function fetchSalesHistory(userId: string) {
       JSON.stringify(
         await Sale.find({ userId: new mongoose.Types.ObjectId(userId) })
           .sort({ createdAt: -1 })
-          .lean()
-      )
+          .lean(),
+      ),
     );
   } catch (error) {
     return [];
@@ -167,7 +131,7 @@ export async function getTotalSales(userId: string) {
     // Sum up the 'totalAmountReceived' field from every sale record
     const total = sales.reduce(
       (acc, sale) => acc + (sale.totalAmountReceived || 0),
-      0
+      0,
     );
 
     return { success: true, totalSales: total };
@@ -227,7 +191,7 @@ export async function getRecentActivities(userId: string) {
 
     // 5. Combine and Sort by the newest first
     const combinedActivities = [...produceActivities, ...salesActivities].sort(
-      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
     );
 
     return combinedActivities.slice(0, 7); // Return the top 5 total

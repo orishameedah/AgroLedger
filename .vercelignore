@@ -1,0 +1,5 @@
+# Ignore test and blockchain directories as well as jest configuration
+
+/_tests_/
+/blockchain/
+jest.config.js

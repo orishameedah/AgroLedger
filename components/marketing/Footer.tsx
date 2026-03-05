@@ -23,7 +23,7 @@ export function Footer() {
               AgroLedger
             </h3>
             <p className="text-muted-foreground leading-relaxed">
-              Securing Nigeria&apos;s harvest through blockchain transparency.
+              Connecting Nigeria Farmers and Buyers
             </p>
 
             {/* --- Social Icons Row --- */}
