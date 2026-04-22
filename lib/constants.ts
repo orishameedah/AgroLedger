@@ -5,6 +5,7 @@ export const FARM_TYPES = [
   "Dairy",
   "Organic",
   "Apiculture",
+  "Fruits",
 ];
 
 export const NIGERIAN_STATES = [
@@ -66,6 +67,7 @@ export const PRODUCE_CATEGORIES = [
   "Dairy",
   "Organic",
   "Apiculture",
+  "Fruits",
 ] as const;
 
 export const UNITS_BY_CATEGORY: Record<string, string[]> = {
@@ -75,6 +77,7 @@ export const UNITS_BY_CATEGORY: Record<string, string[]> = {
   Dairy: ["liters", "bottles", "gallons"],
   Organic: ["kg", "bags", "bundles"],
   Apiculture: ["kg", "jars", "liters"],
+  Fruits: ["kg", "baskets", "bags"],
 };
 
 export const produceMap: Record<string, string> = {

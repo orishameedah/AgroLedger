@@ -44,7 +44,11 @@ function ProduceRow({ item, actions, activeMenu, setActiveMenu }: any) {
       </td>
       <td className="inventory-td text-[11px] text-slate-500">
         {item.updatedAt
-          ? new Date(item.updatedAt).toLocaleDateString()
+          ? new Date(item.updatedAt).toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            })
           : "No Date"}
       </td>
       <td className="inventory-td relative text-center">
