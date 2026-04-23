@@ -37,7 +37,14 @@ function ProduceCard({ item, actions, activeMenu, setActiveMenu }: any) {
             {item.name}
           </h4>
           <p className="text-[11px] text-slate-500">
-            {item.category} • {item.updatedAt ? "Date" : "No Date"}
+            {item.category} •{" "}
+            {item.updatedAt
+              ? new Date(item.updatedAt).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                })
+              : "No Date"}
           </p>
         </div>
         <button
