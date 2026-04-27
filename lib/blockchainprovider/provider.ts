@@ -20,7 +20,7 @@
 
 // lib/blockchain/provider.ts
 import { ethers } from "ethers";
-import AgroledgerABI from "@/lib/blockchain/abi/AgroledgerProduce.json";
+import AgroledgerABI from "@/lib/blockchainprovider/abi/AgroledgerProduce.json";
 
 export const getAgroledgerContract = () => {
   const rpcUrl = process.env.SEPOLIA_RPC_URL;

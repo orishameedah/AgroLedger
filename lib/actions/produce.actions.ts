@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import dbConnect from "../mongodb"; // Ensure you have a DB connection util
 import Produce from "@/models/Produce";
 import mongoose from "mongoose";
-import { getAgroledgerContract } from "@/lib/blockchain/provider";
+import { getAgroledgerContract } from "@/lib/blockchainprovider/provider";
 
 export async function saveProduce(data: any, userId: string) {
   try {
