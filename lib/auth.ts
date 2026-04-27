@@ -150,8 +150,8 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60,
   },
-  pages: {
-    signIn: "/login/buyer",
-    error: "/login/buyer",
-  },
+  // pages: {
+  //   signIn: "/login/buyer",
+  //   error: "/login/buyer",
+  // },
 };
