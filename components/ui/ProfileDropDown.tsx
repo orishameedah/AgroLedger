@@ -27,7 +27,8 @@ export function ProfileDropdown({ user }: { user: any }) {
 
   const handleLogout = () => {
     const role = user?.role;
-    const redirectPath = role === "farmer" ? "/login/farmer" : "/login/buyer";
+    // const redirectPath = role === "farmer" ? "/login/farmer" : "/login/buyer";
+    const redirectPath = "/login";
 
     signOut({ callbackUrl: redirectPath });
   };

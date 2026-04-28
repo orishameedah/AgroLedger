@@ -13,7 +13,8 @@ export default async function Layout({
 
   // Security: If no session, they can't see the dashboard
   if (!session) {
-    redirect("/login/farmer");
+    // redirect("/login/farmer");
+    redirect("/login");
   }
 
   return (

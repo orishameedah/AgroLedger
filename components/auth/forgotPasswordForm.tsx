@@ -40,14 +40,16 @@ export const ForgotPasswordForm = ({ role }: ForgotPasswordProps) => {
       setShowSuccess(true);
 
       setTimeout(() => {
-        router.push(role === "farmer" ? "/login/farmer" : "/login/buyer");
+        // router.push(role === "farmer" ? "/login/farmer" : "/login/buyer");
+        router.push("/login");
       }, 3000);
 
       // Redirect immediately upon success
-      router.push(role === "farmer" ? "/login/farmer" : "/login/buyer");
+      // router.push(role === "farmer" ? "/login/farmer" : "/login/buyer");
+      // router.push("/login");
     } catch (error: any) {
       setServerError(
-        error.response?.data?.message || "Failed to reset password"
+        error.response?.data?.message || "Failed to reset password",
       );
     }
   };

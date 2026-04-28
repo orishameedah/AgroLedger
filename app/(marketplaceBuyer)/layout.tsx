@@ -12,7 +12,8 @@ export default async function Layout({
   const session = await getServerSession(authOptions);
 
   if (!session) {
-    redirect("/login/buyer");
+    // redirect("/login/buyer");
+    redirect("/login");
   }
 
   return (

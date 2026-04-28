@@ -83,7 +83,8 @@ export function DashboardLayout({
           {/* Bottom Logout */}
           <div className="px-4 py-6 border-t border-emerald-800/50">
             <button
-              onClick={() => signOut({ callbackUrl: "/login/farmer" })}
+              // onClick={() => signOut({ callbackUrl: "/login/farmer" })}
+              onClick={() => signOut({ callbackUrl: "/login" })}
               className="flex w-full items-center cursor-pointer gap-3 px-4 py-3 text-emerald-100/70 hover:bg-red-500/10 hover:text-red-400 rounded-xl transition-all duration-200"
             >
               <LogOut className="w-5 h-5" />

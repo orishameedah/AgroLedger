@@ -49,6 +49,7 @@ export const SignUpForm = ({ mainTitle, formTitle, role }: AuthFormProps) => {
 
       setTimeout(() => {
         router.push(role === "farmer" ? "/login/farmer" : "/login/buyer");
+        // router.push("/login");
       }, 3000);
     } catch (error: any) {
       setServerError(
@@ -65,7 +66,8 @@ export const SignUpForm = ({ mainTitle, formTitle, role }: AuthFormProps) => {
   };
 
   // Dynamically set the signup link based on the role prop
-  const loginPath = role === "farmer" ? "/login/farmer" : "/login/buyer";
+  // const loginPath = role === "farmer" ? "/login/farmer" : "/login/buyer";
+  const loginPath = "/login";
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev); // Toggles true/false
   };
