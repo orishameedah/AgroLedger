@@ -95,7 +95,8 @@ export const LoginForm = ({ mainTitle, formTitle, role }: AuthFormProps) => {
 
         setTimeout(() => {
           setIsRedirecting(true); // Show the button loader/spinner
-          const path = role === "farmer" ? "/farmer-setup" : "/marketplace";
+          // const path = role === "farmer" ? "/farmer-setup" : "/marketplace";
+          const path = role === "farmer" ? "/farmer-dashboard" : "/marketplace";
           router.push(path);
           router.refresh();
         }, 2000);

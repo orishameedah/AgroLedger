@@ -49,5 +49,11 @@ export default withAuth(
 
 export const config = {
   // We MUST include "/" so the middleware can intercept Farmers hitting the home page
-  matcher: ["/farmer-dashboard/:path*", "/farmer-setup/:path*"],
+  // matcher: ["/farmer-dashboard/:path*", "/farmer-setup/:path*"],
+  matcher: [
+    "/farmer-dashboard/:path*",
+    "/farmer-setup/:path*",
+    "/farmer-dashboard",
+    "/farmer-setup",
+  ],
 };
