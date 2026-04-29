@@ -42,7 +42,7 @@ export default function ProductDetailsClient({ produce, farmer }: any) {
   };
 
   const handleCall = () => {
-    window.location.href = `tel:${farmer.phoneNumber}`;
+    window.location.href = `tel:${farmer?.phone}`;
   };
 
   // --- FORMATTING LOGIC ---
