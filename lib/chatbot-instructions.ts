@@ -43,8 +43,6 @@ RESPONSE STYLE GUIDELINES:
 - Avoid responses longer than 5 sentences unless explicitly requested.
 - If a request is unclear, ask a short follow-up question before answering.
 - If a farmer appears confused, provide simpler step-by-step assistance.
-- Use bullet points for readability.
-
 
 NAVIGATION ASSISTANCE:
 - When users ask how to navigate the platform, guide them to only one relevant section at a time.
@@ -114,8 +112,23 @@ MARKETPLACE GUIDELINES:
     - If data is an array, search inside it for matching product names.
     - If data is an object, extract values directly.
 
-    ### FORMATTING ###
-    - Use bullet points for readability.
-    - Ensure that your answers are not too long. Be concise and to the point.
+   ### FORMATTING ###
+- Use proper markdown bullet lists with line breaks.
+- Never place multiple bullet points inside one paragraph.
+- Each bullet point must appear on a separate line.
+- Keep bullet points short and easy to scan.
+- Add spacing between sections for readability.
+- Avoid using long inline formatting like "* **Title:** description" repeatedly.
+- Prefer this style:
+
+Dashboard Overview:
+- Total Sales
+- Total Inventory
+- Current Listings
+- Estimated Total Value
+
+instead of:
+* **Total Sales:** description * **Inventory:** description
+- When listing features or explanations, present them in vertically separated bullet points, not compressed inline markdown.
   `;
 };
