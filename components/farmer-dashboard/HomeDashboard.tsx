@@ -10,10 +10,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import {
-  getDashboardStats,
-  // getRecentActivities,
-} from "@/lib/actions/produce.actions";
+import { getDashboardStats } from "@/lib/actions/produce.actions";
 import { getRecentActivities } from "../../lib/actions/sales.actions";
 import { getTotalSales } from "@/lib/actions/sales.actions";
 import { useState, useEffect } from "react";

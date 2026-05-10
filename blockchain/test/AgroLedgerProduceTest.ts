@@ -2,13 +2,11 @@
 import { expect } from "chai";
 import hre from "hardhat";
 // network.connect() provides the ethers instance and network helpers in Hardhat v3
-const { ethers, networkHelpers } = await hre.network.connect(); 
+const { ethers, networkHelpers } = await hre.network.connect();
 
 describe("AgroledgerProduce Contract", function () {
-  // We use a fixture to deploy the contract once for each test group
   async function deployAgroledgerFixture() {
     const Agroledger = await ethers.deployContract("AgroledgerProduce");
-    // getSigners returns an array of signers; provider.getSigner() returns only one
     const [owner, otherAccount] = await ethers.getSigners();
 
     return { agroledger: Agroledger, owner, otherAccount };

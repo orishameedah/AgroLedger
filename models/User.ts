@@ -22,7 +22,7 @@ const UserSchema = new Schema(
     password: {
       type: String,
       required: false,
-      select: false, // Prevents password from being returned in general queries for security
+      select: false,
     },
     role: {
       type: String,
@@ -37,7 +37,7 @@ const UserSchema = new Schema(
       type: String, // Stores Google Profile picture if they use Google Auth
     },
   },
-  { timestamps: true } // Automatically adds createdAt and updatedAt fields
+  { timestamps: true }, // Automatically adds createdAt and updatedAt fields
 );
 
 // This export pattern is vital for Next.js to prevent re-compiling the model

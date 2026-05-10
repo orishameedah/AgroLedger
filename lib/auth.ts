@@ -10,15 +10,17 @@ import { cookies } from "next/headers";
 export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
+      //Google signin
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
       authorization: {
         params: {
-          prompt: "select_account", // This FORCES the pop-up to show all accounts
+          prompt: "select_account",
         },
       },
     }),
     CredentialsProvider({
+      //Manual login
       name: "Credentials",
       credentials: {
         identifier: { label: "Email or Username", type: "text" },
@@ -61,7 +63,6 @@ export const authOptions: NextAuthOptions = {
           const userEmail = user.email?.toLowerCase();
           const existingUser = await UserModel.findOne({ email: userEmail });
 
-          // READ THE STICKY NOTE
           const cookieStore = cookies();
           const detectedRole =
             (await cookieStore).get("agro_role")?.value || "buyer";
@@ -89,7 +90,6 @@ export const authOptions: NextAuthOptions = {
       return true;
     },
 
-    // Using the types explicitly to satisfy TypeScript
     async jwt({
       token,
       user,
@@ -148,9 +148,9 @@ export const authOptions: NextAuthOptions = {
   },
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60,
+    maxAge: 24 * 60 * 60,
   },
   pages: {
-    signIn: "/login", // Now points to your generic login page
+    signIn: "/login",
   },
 };

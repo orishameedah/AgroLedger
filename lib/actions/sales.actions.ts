@@ -20,7 +20,7 @@ export async function createSale(userId: string, data: any) {
     }
     await Sale.create({ ...data, userId });
 
-    // 2. Machine Evaluation: Subtract Quantity
+    // Machine Evaluation: Subtract Quantity
     if (data.produceId) {
       const newQty = Math.max(0, data.stockBeforeSale - data.totalQuantitySold);
       await Produce.findByIdAndUpdate(data.produceId, {
@@ -47,10 +47,8 @@ export async function updateSale(saleId: string, newData: any) {
     if (oldSale.produceId) {
       const produce = await Produce.findById(oldSale.produceId);
       if (produce) {
-        // Step A: "Refund" the old total quantity back to temporary stock
         const restoredQty = produce.quantity + oldSale.totalQuantitySold;
 
-        // Step B: Calculate what the final quantity WOULD be
         const newTotalSold = Number(newData.totalQuantitySold);
 
         // SIMPLE GUARD LOGIC: Check if the new sale exceeds total available stock

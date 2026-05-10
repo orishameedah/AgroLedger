@@ -28,8 +28,8 @@ const ProduceSchema = new Schema(
       enum: ["none", "processing", "published"],
       default: "none",
     },
-    transactionHash: { type: String }, // The "Seal" link
-    lastSyncedAt: { type: Date }, // To show "Verified 2 hours ago"
+    transactionHash: { type: String },
+    lastSyncedAt: { type: Date },
 
     isArchived: { type: Boolean, default: false }, // For "Deleting" without losing data
     lastPublishedSnapshot: {

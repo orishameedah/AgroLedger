@@ -10,7 +10,6 @@ export async function saveProduce(data: any, userId: string) {
   try {
     await dbConnect();
 
-    // 1. Calculate Total Price (Logic stays on server for security)
     const qty = parseFloat(data.quantity);
     const price = parseFloat(data.pricePerUnit);
     const totalPrice = qty * price;
@@ -23,7 +22,7 @@ export async function saveProduce(data: any, userId: string) {
       unit: data.unit,
       pricePerUnit: price,
       totalPrice: totalPrice,
-      image: data.image || "", // We will handle Cloudinary later
+      image: data.image || "",
       blockchainStatus: "none",
     };
 
@@ -51,8 +50,7 @@ export async function fetchAllProduce(userId: string) {
 
     const produceList = await Produce.find({
       userId,
-      // isArchived: { $ne: true },
-    }).sort({ updatedAt: -1 }); // Newest first
+    }).sort({ updatedAt: -1 });
 
     return {
       success: true,
@@ -130,7 +128,6 @@ export async function publishProduceToBlockchain(produceId: string) {
     // 2. BLOCKCHAIN NOTARIZATION
     const contract = getAgroledgerContract();
 
-    // Using your updated contract with 'syncedBy' and 'require' checks
     const tx = await contract.syncProduce(
       produce._id.toString(),
       produce.pricePerUnit,
@@ -181,7 +178,7 @@ export async function unpublishProduce(produceId: string) {
     );
 
     revalidatePath("/dashboard/produce");
-    revalidatePath("/marketplace"); // Ensure the buyer sees it's gone!
+    revalidatePath("/marketplace");
 
     return { success: true };
   } catch (error) {
@@ -214,8 +211,6 @@ export async function getProduceById(id: string) {
   }
 }
 
-// lib/actions/produce.actions.ts
-
 export async function getRelatedProduce(
   farmerId: string,
   category: string,
@@ -224,7 +219,6 @@ export async function getRelatedProduce(
   try {
     await dbConnect();
 
-    // 1. Try to find other items from the SAME FARMER first
     let related = await Produce.find({
       userId: farmerId,
       _id: { $ne: currentProduceId },
@@ -233,7 +227,6 @@ export async function getRelatedProduce(
       .limit(4)
       .lean();
 
-    // 2. FALLBACK: If the farmer has nothing else, find items in the SAME CATEGORY
     if (related.length === 0) {
       related = await Produce.find({
         category: category,

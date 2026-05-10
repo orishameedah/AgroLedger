@@ -14,8 +14,8 @@ import { Loader2 } from "lucide-react";
 import { SuccessMessage } from "../ui/SuccessMessage";
 
 interface AuthFormProps {
-  mainTitle: string; // Title above the card (e.g., Agroledger Dashboard)
-  formTitle: string; // Title inside the card (e.g., SignUp to Dashboard)
+  mainTitle: string;
+  formTitle: string;
   role: "farmer" | "buyer";
 }
 
@@ -27,13 +27,13 @@ export const LoginForm = ({ mainTitle, formTitle, role }: AuthFormProps) => {
   const signupPath = role === "farmer" ? "/signup/farmer" : "/signup/buyer";
 
   const togglePasswordVisibility = () => {
-    setShowPassword((prev) => !prev); // Toggles true/false
+    setShowPassword((prev) => !prev);
   };
 
   const [error, setError] = useState("");
   const router = useRouter();
 
-  const [isRedirecting, setIsRedirecting] = useState(false); // New state for global loading
+  const [isRedirecting, setIsRedirecting] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({
     identifier: "",
     password: "",
@@ -52,7 +52,6 @@ export const LoginForm = ({ mainTitle, formTitle, role }: AuthFormProps) => {
   });
   const handleGoogleLogin = async () => {
     setIsRedirecting(true);
-    // Create the "Sticky Note"
     document.cookie = `agro_role=${role}; path=/; max-age=300`;
     const callbackUrl = role === "farmer" ? "/farmer-setup" : "/marketplace";
     await signIn("google", { callbackUrl });
@@ -94,8 +93,7 @@ export const LoginForm = ({ mainTitle, formTitle, role }: AuthFormProps) => {
         setShowSuccess(true);
 
         setTimeout(() => {
-          setIsRedirecting(true); // Show the button loader/spinner
-          // const path = role === "farmer" ? "/farmer-setup" : "/marketplace";
+          setIsRedirecting(true);
           const path = role === "farmer" ? "/farmer-dashboard" : "/marketplace";
           router.push(path);
           router.refresh();

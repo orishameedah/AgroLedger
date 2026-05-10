@@ -14,8 +14,8 @@ import { useRouter } from "next/navigation";
 import { SuccessMessage } from "../ui/SuccessMessage";
 
 interface AuthFormProps {
-  mainTitle: string; // Title above the card (e.g., Agroledger Dashboard)
-  formTitle: string; // Title inside the card (e.g., SignUp to Dashboard)
+  mainTitle: string;
+  formTitle: string;
   role: "farmer" | "buyer";
 }
 
@@ -38,18 +38,16 @@ export const SignUpForm = ({ mainTitle, formTitle, role }: AuthFormProps) => {
   const onSubmit = async (data: SignupInput) => {
     setServerError(null);
     try {
-      // 1. Send data to our custom signup API
       await axios.post("/api/auth/signup", {
         ...data,
-        role, // Pass the role prop (farmer or buyer)
+        role,
       });
 
-      // 2. On success, redirect to login
+      // On success, redirect to login
       setShowSuccess(true);
 
       setTimeout(() => {
         router.push(role === "farmer" ? "/login/farmer" : "/login/buyer");
-        // router.push("/login");
       }, 3000);
     } catch (error: any) {
       setServerError(
@@ -58,15 +56,12 @@ export const SignUpForm = ({ mainTitle, formTitle, role }: AuthFormProps) => {
     }
   };
   const handleGoogleSignup = () => {
-    setIsRedirecting(true); // Now it has loading!
-    // Create the "Sticky Note"
+    setIsRedirecting(true);
     document.cookie = `agro_role=${role}; path=/; max-age=300`;
     const callbackUrl = role === "farmer" ? "/farmer-setup" : "/marketplace";
     signIn("google", { callbackUrl });
   };
 
-  // Dynamically set the signup link based on the role prop
-  // const loginPath = role === "farmer" ? "/login/farmer" : "/login/buyer";
   const loginPath = "/login";
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev); // Toggles true/false

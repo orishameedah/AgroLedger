@@ -1,24 +1,3 @@
-// lib/blockchain/provider.ts
-
-// import { ethers } from "ethers";
-// import AgroledgerABI from "@/lib/blockchain/abi/AgroledgerProduce.json";
-
-// export const getAgroledgerContract = () => {
-//   // 1. Provider (read blockchain)
-//   const provider = new ethers.JsonRpcProvider(process.env.SEPOLIA_RPC_URL);
-
-//   // 2. Backend signer (your system wallet)
-//   const signer = new ethers.Wallet(process.env.SEPOLIA_PRIVATE_KEY!, provider);
-
-//   // 3. Contract instance
-//   return new ethers.Contract(
-//     process.env.AGROLEDGER_CONTRACT_ADDRESS!,
-//     AgroledgerABI,
-//     signer,
-//   );
-// };
-
-// lib/blockchain/provider.ts
 import { ethers } from "ethers";
 import AgroledgerABI from "@/lib/blockchainprovider/abi/AgroledgerProduce.json";
 

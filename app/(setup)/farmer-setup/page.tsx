@@ -6,12 +6,8 @@ import { FarmerSetupForm } from "@/components/forms/FarmerSetupForm";
 export default async function FarmerSetupPage() {
   const session = await getServerSession(authOptions);
 
-  // 1. Force Login Check
-  if (!session)
-    // redirect("/login/farmer");
-    redirect("/login");
+  if (!session) redirect("/login");
 
-  // 2. Setup Completion Check
   if (session?.user?.isSetupComplete) {
     redirect("/farmer-dashboard");
   }
