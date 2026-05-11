@@ -39,6 +39,48 @@ export async function getFarmerSettings(userId: string) {
 /**
  * Updates both collections in a single operation
  */
+// export async function updateFarmerSettings(userId: string, data: any) {
+//   try {
+//     await dbConnect();
+
+//     const user = await User.findById(userId).select("+password");
+
+//     const isGoogle = !user?.password;
+
+//     if (isGoogle) {
+//       return {
+//         success: false,
+//         error: "Google accounts cannot edit fullname or username",
+//       };
+//     }
+
+//     // 1. Update User Profile (Basic Info)
+//     await User.findByIdAndUpdate(userId, {
+//       name: data.fullName,
+//       username: data.username,
+//     });
+
+//     // 2. Update Farm Profile (Deep Settings)
+//     await Farm.findOneAndUpdate(
+//       { userId },
+//       {
+//         phoneNumber: data.phone,
+//         farmName: data.farmName,
+//         farmTypes: data.farmTypes,
+//         locations: data.locations,
+//         availability: data.availability,
+//       },
+//       { upsert: true }, // Create if missing
+//     );
+
+//     revalidatePath("/settings-farmer");
+//     return { success: true };
+//   } catch (error) {
+//     console.error("Update Error:", error);
+//     return { success: false, error: "Database update failed" };
+//   }
+// }
+
 export async function updateFarmerSettings(userId: string, data: any) {
   try {
     await dbConnect();
@@ -47,20 +89,19 @@ export async function updateFarmerSettings(userId: string, data: any) {
 
     const isGoogle = !user?.password;
 
-    if (isGoogle) {
-      return {
-        success: false,
-        error: "Google accounts cannot edit fullname or username",
-      };
+    // Only allow manual users to edit identity fields
+    const updateData: any = {};
+
+    if (!isGoogle) {
+      updateData.name = data.fullName;
+      updateData.username = data.username;
     }
 
-    // 1. Update User Profile (Basic Info)
-    await User.findByIdAndUpdate(userId, {
-      name: data.fullName,
-      username: data.username,
-    });
+    if (Object.keys(updateData).length > 0) {
+      await User.findByIdAndUpdate(userId, updateData);
+    }
 
-    // 2. Update Farm Profile (Deep Settings)
+    // Allow ALL users to update farm settings
     await Farm.findOneAndUpdate(
       { userId },
       {
@@ -70,10 +111,11 @@ export async function updateFarmerSettings(userId: string, data: any) {
         locations: data.locations,
         availability: data.availability,
       },
-      { upsert: true }, // Create if missing
+      { upsert: true },
     );
 
-    revalidatePath("/settings-farmer");
+    revalidatePath("/farmer-dashboard/settings");
+
     return { success: true };
   } catch (error) {
     console.error("Update Error:", error);
