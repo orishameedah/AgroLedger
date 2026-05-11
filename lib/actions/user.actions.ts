@@ -73,7 +73,7 @@ export async function updateFarmerSettings(userId: string, data: any) {
       { upsert: true }, // Create if missing
     );
 
-    revalidatePath("/settings");
+    revalidatePath("/settings-farmer");
     return { success: true };
   } catch (error) {
     console.error("Update Error:", error);
