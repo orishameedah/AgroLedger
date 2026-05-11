@@ -63,7 +63,7 @@ export function SettingsPage() {
   };
 
   // NEW: Detect Google Account based on your schema logic
-  const isGoogleAccount = formData.isGoogle;
+  const isGoogleAccount = !!formData.isGoogle;
 
   if (isLoading)
     return (
@@ -169,6 +169,7 @@ export function SettingsPage() {
         </div>
         <div className="settings-card-content space-y-8">
           <InputItem
+            type="text"
             label="Farm Name"
             value={formData.farmName}
             disabled={!isEditing}
@@ -181,6 +182,7 @@ export function SettingsPage() {
             <div className="flex flex-wrap gap-2">
               {FARM_TYPES.map((type) => (
                 <button
+                  type="button"
                   key={type}
                   disabled={!isEditing}
                   onClick={() => {
@@ -212,6 +214,7 @@ export function SettingsPage() {
                 : NIGERIAN_STATES.slice(0, 8)
               ).map((state) => (
                 <button
+                  type="button"
                   key={state}
                   disabled={!isEditing}
                   onClick={() => {
@@ -231,6 +234,7 @@ export function SettingsPage() {
               ))}
               {isEditing && (
                 <button
+                  type="button"
                   onClick={() => setShowAllStates(!showAllStates)}
                   className="text-[14px] cursor-pointer font-bold text-emerald-600 px-2"
                 >
@@ -283,6 +287,7 @@ export function SettingsPage() {
             <div className="flex flex-wrap gap-2">
               {DAYS_OF_WEEK.map((day) => (
                 <button
+                  type="button"
                   key={day}
                   disabled={!isEditing}
                   onClick={() => {
